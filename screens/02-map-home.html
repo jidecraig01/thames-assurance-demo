@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+:root {
+  --tw-blue: #009CDE;
+  --tw-cyan: #00A3E0;
+  --navy: #0A2540;
+  --navy-mid: #12355C;
+  --rag-g: #22C55E;
+  --rag-a: #F59E0B;
+  --rag-r: #EF4444;
+  --rail-w: 248px;
+  --font: "Inter", "Segoe UI", system-ui, sans-serif;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { width: 1440px; height: 900px; overflow: hidden; font-family: var(--font); background: #050810; color: #E8F1F8; }
+
+.rail {
+  position: absolute; left: 0; top: 0; bottom: 0; width: var(--rail-w);
+  background: #FFFFFF; color: var(--navy);
+  display: flex; flex-direction: column; z-index: 30;
+  box-shadow: 4px 0 24px rgba(5,8,16,0.35);
+}
+.rail-brand { padding: 18px 18px 16px; display: flex; align-items: center; gap: 12px; }
+.logo-plate {
+  flex-shrink: 0; width: 52px; height: 52px; border-radius: 14px; background: #fff;
+  display: grid; place-items: center;
+  box-shadow: 0 1px 0 rgba(10,37,64,0.06), 0 0 0 1px rgba(10,37,64,0.08);
+}
+.logo-plate img { width: 44px; height: 44px; border-radius: 50%; display: block; }
+.brand-text .org { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; color: var(--navy); text-transform: uppercase; }
+.brand-text .app { font-size: 12.5px; font-weight: 600; color: #3A556E; margin-top: 2px; }
+.divider { height: 1px; margin: 0 16px; background: var(--navy); opacity: 0.18; }
+.nav { padding: 14px 12px 8px; display: flex; flex-direction: column; gap: 2px; flex: 1; }
+.nav-label { font-size: 10px; font-weight: 700; letter-spacing: 0.1em; color: #6A8299; text-transform: uppercase; padding: 6px 12px 8px; }
+.nav-item {
+  display: flex; align-items: center; gap: 11px;
+  padding: 10px 12px; border-radius: 10px;
+  font-size: 13.5px; font-weight: 500; color: #3A556E;
+}
+.nav-item svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
+.nav-item.active {
+  background: rgba(0,156,222,0.12); color: #0077A8; font-weight: 650;
+  box-shadow: inset 0 0 0 1px rgba(0,156,222,0.35);
+}
+.nav-item .badge-n {
+  margin-left: auto; font-size: 10px; font-weight: 700;
+  padding: 2px 7px; border-radius: 999px;
+  background: rgba(239,68,68,0.12); color: #B91C1C;
+}
+.nav-section-gap { height: 8px; }
+.rail-foot { padding: 12px 14px 16px; }
+.user-card {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 10px; border-radius: 12px;
+  background: #F4F8FB; border: 1px solid rgba(10,37,64,0.08);
+}
+.avatar {
+  width: 34px; height: 34px; border-radius: 50%;
+  background: linear-gradient(135deg, #009CDE, #005A8C);
+  color: #fff; font-size: 12px; font-weight: 700; display: grid; place-items: center;
+}
+.user-meta .name { font-size: 12.5px; font-weight: 650; color: var(--navy); }
+.user-meta .role { font-size: 11px; color: #6A8299; margin-top: 1px; }
+
+.topbar {
+  position: absolute; left: var(--rail-w); right: 0; top: 0; height: 60px;
+  display: flex; align-items: center; gap: 16px; padding: 0 22px;
+  background: linear-gradient(180deg, rgba(8,12,22,0.96), rgba(8,12,22,0.72));
+  border-bottom: 1px solid rgba(0,163,224,0.14); z-index: 20;
+}
+.brand-title { font-size: 15px; font-weight: 650; color: #F2F7FB; letter-spacing: 0.01em; }
+.brand-sub { font-size: 11px; color: #7DD3F0; font-weight: 600; letter-spacing: 0.12em; margin-top: 1px; }
+.search {
+  flex: 1; max-width: 380px; margin: 0 auto; height: 36px; border-radius: 10px;
+  padding: 0 14px 0 36px; font-size: 13px; color: #9ec;
+  background-color: rgba(15,22,41,0.9);
+  border: 1px solid rgba(0,163,224,0.22);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='none' stroke='%23889' stroke-width='2'%3E%3Ccircle cx='6' cy='6' r='4.5'/%3E%3Cpath d='M10 10l3 3'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: 12px center;
+}
+.rag-summary { display: flex; align-items: center; gap: 8px; }
+.rag-chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 11px; border-radius: 999px; font-size: 12px; font-weight: 600;
+  background: rgba(15,22,41,0.85); border: 1px solid rgba(0,163,224,0.2); color: #D7E8F4;
+}
+.dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+.dot.g { background: var(--rag-g); box-shadow: 0 0 8px rgba(34,197,94,0.55); }
+.dot.a { background: var(--rag-a); box-shadow: 0 0 8px rgba(245,158,11,0.55); }
+.dot.r { background: var(--rag-r); box-shadow: 0 0 8px rgba(239,68,68,0.55); }
+
+.main {
+  position: absolute; left: var(--rail-w); top: 60px; right: 0; bottom: 0;
+  overflow: hidden; background: #050810;
+}
+#map { position: absolute; inset: 0; background: #0a1018; }
+
+.leaflet-container { background: #0a1018; font-family: var(--font); }
+.leaflet-control-attribution {
+  background: rgba(8,12,22,0.75)!important; color: #6A8FA8!important;
+  font-size: 9px!important; max-width: 280px;
+}
+.leaflet-control-attribution a { color: #7DD3F0!important; }
+
+.region-cards {
+  position: absolute; right: 22px; top: 18px;
+  display: flex; flex-direction: column; gap: 10px; z-index: 800;
+  width: 248px; pointer-events: none;
+}
+.rcard {
+  background: rgba(10,14,26,0.88);
+  border: 1px solid rgba(0,163,224,0.28);
+  border-radius: 14px; padding: 14px 14px 12px;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 10px 36px rgba(0,0,0,0.45);
+}
+.rcard.london { border-color: rgba(0,163,224,0.55); box-shadow: 0 0 0 1px rgba(0,163,224,0.15), 0 10px 36px rgba(0,0,0,0.45); }
+.rcard.tv { border-color: rgba(56,189,248,0.35); }
+.rcard .rname { font-size: 13px; font-weight: 700; color: #EAF6FC; letter-spacing: 0.02em; }
+.rcard .rsub { font-size: 11px; color: #7AA0B8; margin-top: 2px; margin-bottom: 10px; }
+.rcard .rstats { display: flex; gap: 6px; flex-wrap: wrap; }
+.rstat {
+  font-size: 11px; font-weight: 650; padding: 4px 8px; border-radius: 8px;
+  background: rgba(255,255,255,0.05); color: #C8DCE8;
+  border: 1px solid rgba(255,255,255,0.06);
+}
+.rstat.g { color: #86EFAC; background: rgba(34,197,94,0.12); border-color: rgba(34,197,94,0.25); }
+.rstat.a { color: #FCD34D; background: rgba(245,158,11,0.12); border-color: rgba(245,158,11,0.28); }
+.rstat.r { color: #FCA5A5; background: rgba(239,68,68,0.14); border-color: rgba(239,68,68,0.3); }
+.hint { font-size: 10.5px; color: #6A8FA8; margin-top: 9px; line-height: 1.35; }
+
+.legend {
+  position: absolute; left: 50%; bottom: 22px; transform: translateX(-50%);
+  display: flex; align-items: center; gap: 16px; padding: 10px 20px; font-size: 12px;
+  background: rgba(10,14,26,0.86); border: 1px solid rgba(0,163,224,0.22);
+  border-radius: 14px; backdrop-filter: blur(12px);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4); color: #C8DCE8; white-space: nowrap; z-index: 800;
+  pointer-events: none;
+}
+.leg-swatch {
+  width: 14px; height: 14px; border-radius: 4px; display: inline-block; margin-right: 6px; vertical-align: -2px;
+}
+.leg-swatch.lon { background: rgba(0,163,224,0.55); box-shadow: inset 0 0 0 1.5px #00A3E0; }
+.leg-swatch.tv { background: rgba(45,212,191,0.4); box-shadow: inset 0 0 0 1.5px #2DD4BF; }
+
+.pin-wrap { position: relative; width: 0; height: 0; }
+.pin-dot {
+  position: absolute; left: -7px; top: -7px;
+  width: 14px; height: 14px; border-radius: 50%;
+  border: 2px solid #fff; box-shadow: 0 0 0 1px rgba(0,0,0,0.35), 0 2px 8px rgba(0,0,0,0.45);
+}
+.pin-dot.g { background: #22C55E; }
+.pin-dot.a { background: #F59E0B; width: 16px; height: 16px; left: -8px; top: -8px; box-shadow: 0 0 0 1px rgba(0,0,0,0.35), 0 0 14px rgba(245,158,11,0.55); }
+.pin-dot.r { background: #EF4444; width: 16px; height: 16px; left: -8px; top: -8px; box-shadow: 0 0 0 1px rgba(0,0,0,0.35), 0 0 16px rgba(239,68,68,0.65); }
+.pin-label {
+  position: absolute; left: 12px; top: -9px;
+  font-size: 11px; font-weight: 650; color: #E8F4FA;
+  white-space: nowrap; text-shadow: 0 0 4px #050810, 0 1px 3px #050810, 1px 0 3px #050810, -1px 0 3px #050810;
+  pointer-events: none;
+}
+.pin-label.offset-l { left: auto; right: 12px; }
+.region-name-label {
+  background: transparent!important; border: none!important;
+  font-family: Inter, sans-serif; font-weight: 800; letter-spacing: 0.14em;
+  color: #E0F2FE; text-shadow: 0 0 8px rgba(0,163,224,0.6), 0 2px 6px #050810;
+  font-size: 15px; text-align: center;
+}
+.region-name-label.tv { color: #CCFBF1; letter-spacing: 0.1em; font-size: 13px; }
+.wrz-hint {
+  background: transparent!important; border: none!important;
+  font-family: Inter, sans-serif; font-size: 10px; font-weight: 600;
+  color: rgba(125,180,210,0.55); letter-spacing: 0.06em;
+  text-shadow: 0 1px 3px #050810;
+}
+
+/* Darken OSM tiles to fit dark chrome while keeping roads/rivers/labels readable */
+.leaflet-tile-pane {
+  filter: invert(1) hue-rotate(180deg) brightness(0.95) contrast(0.92) saturate(0.55);
+}
+.leaflet-container { background: #0b1220; }
+
+.logout-btn {
+  display:flex; align-items:center; justify-content:center; gap:7px;
+  width:100%; margin-top:8px; padding:7px 10px;
+  border-radius:9px; border:1px solid rgba(10,37,64,0.14);
+  background:#fff; color:#3A556E;
+  font-family:inherit; font-size:11px; font-weight:650; letter-spacing:0.04em;
+  cursor:pointer;
+}
+.logout-btn svg { width:14px; height:14px; stroke:currentColor; fill:none; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; flex-shrink:0; }
+.logout-btn:hover { background:#F4F8FB; color:var(--navy); border-color:rgba(10,37,64,0.22); }
+</style>
+<link rel="stylesheet" href="../nav.css"/>
+</head><body data-demo-site="shared">
+
+<svg style="display:none">
+  <symbol id="i-map" viewBox="0 0 24 24"><path d="M9 3l6 2 6-2v16l-6 2-6-2-6 2V5l6-2z"/><path d="M9 3v16M15 5v16"/></symbol>
+  <symbol id="i-regions" viewBox="0 0 24 24"><path d="M4 6l8-3 8 3v12l-8 3-8-3V6z"/><path d="M12 3v18M4 12h16"/></symbol>
+  <symbol id="i-sites" viewBox="0 0 24 24"><path d="M12 21s-7-5.2-7-11a7 7 0 0114 0c0 5.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></symbol>
+  <symbol id="i-prog" viewBox="0 0 24 24"><path d="M4 19V5M4 19h16"/><path d="M8 15V9M12 15V7M16 15v-3"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6l8-3z"/></symbol>
+  <symbol id="i-doc" viewBox="0 0 24 24"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></symbol>
+  <symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 9a6 6 0 0112 0c0 7 2 7 2 9H4c0-2 2-2 2-9"/><path d="M10 20a2 2 0 004 0"/></symbol>
+  <symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M2 12h3M19 12h3M4.9 19.1L7 17M17 7l2.1-2.1"/></symbol>
+  <symbol id="i-logout" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></symbol>
+  <symbol id="i-cam" viewBox="0 0 24 24"><path d="M3 7h12a2 2 0 012 2v8a2 2 0 01-2 2H3a2 2 0 01-2-2V9a2 2 0 012-2z"/><path d="M15 11l6-3v8l-6-3"/><circle cx="8.5" cy="12" r="2"/></symbol>
+</svg>
+
+<aside class="rail">
+  <div class="rail-brand">
+    <div class="logo-plate"><img src="tw-logo-128.png" alt="Thames Water"/></div>
+    <div class="brand-text">
+      <div class="org">Thames Water</div>
+      <div class="app">Project Assurance</div>
+    </div>
+  </div>
+  <div class="divider"></div>
+  <nav class="nav">
+    <div class="nav-label">Navigate</div>
+    <div class="nav-item active" data-demo-nav="map"><svg><use href="#i-map"/></svg>Overview / Map</div>
+    <div class="nav-item" data-demo-nav="regions"><svg><use href="#i-regions"/></svg>Regions</div>
+    <div class="nav-item" data-demo-nav="sites"><svg><use href="#i-sites"/></svg>Site locations</div>
+    <div class="nav-section-gap"></div>
+    <div class="divider" style="margin:4px 4px 10px"></div>
+    <div class="nav-label">Programme</div>
+    <div class="nav-item" data-demo-nav="programme"><svg><use href="#i-prog"/></svg>Programme</div>
+    <div class="nav-item" data-demo-nav="assurance"><svg><use href="#i-shield"/></svg>Assurance</div>
+    <div class="nav-item" data-demo-nav="reports"><svg><use href="#i-doc"/></svg>Reports</div>
+    <div class="nav-item" data-demo-nav="alerts"><svg><use href="#i-bell"/></svg>Alerts <span class="badge-n">3</span></div>
+    <div class="nav-section-gap"></div>
+    <div class="divider" style="margin:4px 4px 10px"></div>
+    <div class="nav-item" data-demo-nav="settings"><svg><use href="#i-gear"/></svg>Settings</div>
+  </nav>
+  <div class="divider"></div>
+    <div class="rail-foot">
+    <div class="user-card">
+      <div class="avatar">AM</div>
+      <div class="user-meta">
+        <div class="name">Alex Morgan</div>
+        <div class="role">Assurance Lead</div>
+      </div>
+    </div>
+    <button class="logout-btn" type="button" data-demo-nav="logout">
+      <svg><use href="#i-logout"/></svg>
+      Log out
+    </button>
+  </div>
+</aside>
+
+<header class="topbar">
+  <div>
+    <div class="brand-title">Map Home</div>
+    <div class="brand-sub">OPERATIONAL REGIONS</div>
+  </div>
+  <input class="search" value="Search regions, sites or assets..." readonly/>
+  <div class="rag-summary">
+    <span class="rag-chip"><span class="dot g"></span>12 sites</span>
+    <span class="rag-chip"><span class="dot a"></span>3 amber</span>
+    <span class="rag-chip"><span class="dot r"></span>1 red</span>
+  </div>
+</header>
+
+<div class="main">
+  <div id="map"></div>
+
+  <div class="region-cards">
+    <div class="rcard london">
+      <div class="rname">London</div>
+      <div class="rsub">Operational region · WRZ London</div>
+      <div class="rstats">
+        <span class="rstat">7 sites</span>
+        <span class="rstat g">6 green</span>
+        <span class="rstat a">1 amber</span>
+      </div>
+      <div class="hint">Click region → site list</div>
+    </div>
+    <div class="rcard tv">
+      <div class="rname">Thames Valley &amp; Home Counties</div>
+      <div class="rsub">Operational region · 5 WRZs</div>
+      <div class="rstats">
+        <span class="rstat">5 sites</span>
+        <span class="rstat g">2 green</span>
+        <span class="rstat a">2 amber</span>
+        <span class="rstat r">1 red</span>
+      </div>
+      <div class="hint">SWOX · Henley · Kennet · SWA · Guildford</div>
+    </div>
+  </div>
+
+  <div class="legend">
+    <span><span class="leg-swatch lon"></span>London</span>
+    <span><span class="leg-swatch tv"></span>Thames Valley &amp; HC</span>
+    <span style="opacity:0.35">|</span>
+    <span><span class="dot g"></span>12</span>
+    <span><span class="dot a"></span>3 amber</span>
+    <span><span class="dot r"></span>1 red</span>
+  </div>
+</div>
+
+<script>
+(function () {
+  // Thames Water ops bounds: SW Cirencester/Swindon → NE Epping/Dartford
+  var bounds = L.latLngBounds([51.05, -1.85], [51.70, 0.35]);
+
+  var map = L.map('map', {
+    zoomControl: false,
+    attributionControl: true,
+    preferCanvas: false,
+    fadeAnimation: false,
+    zoomAnimation: false,
+    markerZoomAnimation: false
+  });
+
+  // Carto Dark Matter — dark UI fit; OSM labels for place names
+  // OpenStreetMap basemap (free, labelled) + CSS darken to fit dark UI
+  var tiles = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+    maxZoom: 19,
+    crossOrigin: true
+  }).addTo(map);
+
+  map.fitBounds(bounds, { padding: [12, 12], animate: false });
+
+  // London — Greater London footprint (cyan glow)
+  var londonPoly = [
+    [51.68, -0.48], [51.70, -0.20], [51.69, 0.05], [51.66, 0.22],
+    [51.58, 0.28], [51.48, 0.25], [51.40, 0.18], [51.33, 0.05],
+    [51.29, -0.10], [51.28, -0.28], [51.32, -0.45], [51.40, -0.52],
+    [51.50, -0.52], [51.58, -0.50], [51.68, -0.48]
+  ];
+  L.polygon(londonPoly, {
+    color: '#00A3E0', weight: 2.2, opacity: 0.95,
+    fillColor: '#00A3E0', fillOpacity: 0.22,
+    className: 'region-london'
+  }).addTo(map);
+
+  // Thames Valley & HC — western cluster Oxford–Reading–Swindon (teal)
+  var tvPoly = [
+    [51.82, -1.80], [51.88, -1.45], [51.85, -1.15], [51.78, -0.90],
+    [51.68, -0.70], [51.55, -0.58], [51.42, -0.62], [51.35, -0.85],
+    [51.32, -1.15], [51.38, -1.55], [51.48, -1.85], [51.62, -1.95],
+    [51.75, -1.90], [51.82, -1.80]
+  ];
+  L.polygon(tvPoly, {
+    color: '#2DD4BF', weight: 2.0, opacity: 0.9,
+    fillColor: '#2DD4BF', fillOpacity: 0.18
+  }).addTo(map);
+
+  // Guildford outlier patch (detached TW sewerage area)
+  var guildfordPoly = [
+    [51.28, -0.68], [51.30, -0.52], [51.26, -0.48], [51.22, -0.55],
+    [51.20, -0.68], [51.24, -0.72], [51.28, -0.68]
+  ];
+  L.polygon(guildfordPoly, {
+    color: '#2DD4BF', weight: 1.8, opacity: 0.85,
+    fillColor: '#2DD4BF', fillOpacity: 0.16
+  }).addTo(map);
+
+  // Light L2 WRZ hints
+  function wrzLabel(latlng, text) {
+    return L.marker(latlng, {
+      interactive: false,
+      icon: L.divIcon({ className: 'wrz-hint', html: text, iconSize: [80, 14], iconAnchor: [40, 7] })
+    }).addTo(map);
+  }
+  wrzLabel([51.78, -1.40], 'SWOX');
+  wrzLabel([51.55, -0.95], 'Henley');
+  wrzLabel([51.42, -1.25], 'Kennet Valley');
+  wrzLabel([51.48, -0.70], 'SWA');
+  wrzLabel([51.24, -0.58], 'Guildford');
+  wrzLabel([51.48, -0.10], 'London WRZ');
+
+  L.marker([51.48, -0.12], {
+    interactive: false,
+    icon: L.divIcon({ className: 'region-name-label', html: 'LONDON', iconSize: [120, 20], iconAnchor: [60, 10] })
+  }).addTo(map);
+  L.marker([51.62, -1.35], {
+    interactive: false,
+    icon: L.divIcon({ className: 'region-name-label tv', html: 'THAMES VALLEY<br/>&amp; HOME COUNTIES', iconSize: [160, 36], iconAnchor: [80, 18] })
+  }).addTo(map);
+
+  // 12 shortlist pins — real approx lat/lng
+  var sites = [
+    { name: 'Beckton', lat: 51.5247, lng: 0.0845, rag: 'a', label: true },
+    { name: 'Crossness', lat: 51.5080, lng: 0.1380, rag: 'g', label: false },
+    { name: 'Mogden', lat: 51.4640, lng: -0.3400, rag: 'g', label: false },
+    { name: 'Hampton', lat: 51.4130, lng: -0.3720, rag: 'g', label: false },
+    { name: 'Q. Mary', lat: 51.4200, lng: -0.4680, rag: 'g', label: false },
+    { name: 'Coppermills', lat: 51.5750, lng: -0.0390, rag: 'g', label: false },
+    { name: 'Abbey Mills', lat: 51.5320, lng: -0.0100, rag: 'g', label: false },
+    { name: 'Oxford', lat: 51.7250, lng: -1.2180, rag: 'r', label: true },
+    { name: 'Farmoor', lat: 51.7600, lng: -1.3500, rag: 'g', label: true },
+    { name: 'White Horse', lat: 51.6200, lng: -1.3200, rag: 'a', label: true },
+    { name: 'Guildford', lat: 51.2360, lng: -0.5750, rag: 'a', label: true },
+    { name: 'Maple Lodge', lat: 51.6520, lng: -0.4940, rag: 'g', label: true }
+  ];
+
+  sites.forEach(function (s) {
+    var html = '<div class="pin-wrap"><div class="pin-dot ' + s.rag + '"></div>' +
+      (s.label ? '<div class="pin-label">' + s.name + '</div>' : '') + '</div>';
+    L.marker([s.lat, s.lng], {
+      interactive: false,
+      icon: L.divIcon({ className: '', html: html, iconSize: [0, 0], iconAnchor: [0, 0] })
+    }).addTo(map);
+  });
+
+  // Signal readiness after tiles settle (Chrome virtual-time / delay)
+  var readyFired = false;
+  function markReady() {
+    if (readyFired) return;
+    readyFired = true;
+    document.documentElement.setAttribute('data-map-ready', '1');
+    document.title = 'MAP_READY';
+  }
+  tiles.on('load', function () { setTimeout(markReady, 800); });
+  setTimeout(markReady, 4500);
+})();
+</script>
+<script src="../nav.js"></script>
+</body></html>

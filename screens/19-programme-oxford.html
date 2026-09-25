@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg: #060B14; --panel: #0A1220; --card: #0F1A2A; --card2: #122033;
+  --border: rgba(100,140,180,0.14); --text: #E8F1F8; --muted: #8AA0B5;
+  --cyan: #00A3E0; --cyan2: #009CDE; --rag-r: #EF4444; --rag-a: #F59E0B; --rag-g: #22C55E;
+  --navy: #0A2540; --rail-w: 220px; --font: Inter, "Segoe UI", system-ui, sans-serif;
+}
+* { box-sizing:border-box; margin:0; padding:0; }
+html, body { width:1440px; height:900px; overflow:hidden; font-family:var(--font); background:var(--bg); color:var(--text); }
+
+.rail {
+  position:absolute; left:0; top:0; bottom:0; width:var(--rail-w);
+  background:#FFFFFF; color:var(--navy);
+  display:flex; flex-direction:column; z-index:30;
+  box-shadow:4px 0 24px rgba(5,8,16,0.35);
+}
+.rail-brand { padding:16px 14px 14px; display:flex; align-items:center; gap:10px; }
+.logo-plate {
+  flex-shrink:0; width:48px; height:48px; border-radius:12px; background:#fff;
+  display:grid; place-items:center;
+  box-shadow:0 1px 0 rgba(10,37,64,0.06), 0 0 0 1px rgba(10,37,64,0.08);
+}
+.logo-plate img { width:40px; height:40px; border-radius:50%; display:block; }
+.brand-text .org { font-size:10.5px; font-weight:700; letter-spacing:0.08em; color:var(--navy); text-transform:uppercase; }
+.brand-text .app { font-size:11.5px; font-weight:600; color:#3A556E; margin-top:2px; }
+.divider { height:1px; margin:0 14px; background:var(--navy); opacity:0.18; }
+.nav { padding:12px 10px 8px; display:flex; flex-direction:column; gap:2px; flex:1; }
+.nav-label { font-size:9.5px; font-weight:700; letter-spacing:0.1em; color:#6A8299; text-transform:uppercase; padding:4px 10px 6px; }
+.nav-item {
+  display:flex; align-items:center; gap:10px;
+  padding:9px 10px; border-radius:10px;
+  font-size:11px; font-weight:650; letter-spacing:0.05em; text-transform:uppercase;
+  color:#3A556E;
+}
+.nav-item svg { width:17px; height:17px; stroke:currentColor; fill:none; stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round; flex-shrink:0; }
+.nav-item.active {
+  background:rgba(0,156,222,0.12); color:#0077A8; font-weight:750;
+  box-shadow:inset 0 0 0 1px rgba(0,156,222,0.35), inset 3px 0 0 #009CDE;
+}
+.rail-foot { padding:10px 12px 14px; }
+.user-card {
+  display:flex; align-items:center; gap:10px;
+  padding:9px 9px; border-radius:12px;
+  background:#F4F8FB; border:1px solid rgba(10,37,64,0.08);
+}
+.avatar {
+  width:32px; height:32px; border-radius:50%;
+  background:linear-gradient(135deg, #009CDE, #005A8C);
+  color:#fff; font-size:11px; font-weight:700; display:grid; place-items:center; flex-shrink:0;
+}
+.user-meta .name { font-size:12px; font-weight:650; color:var(--navy); }
+.user-meta .role { font-size:10.5px; color:#6A8299; margin-top:1px; }
+.logout-btn {
+  display:flex; align-items:center; justify-content:center; gap:7px;
+  width:100%; margin-top:8px; padding:7px 10px;
+  border-radius:9px; border:1px solid rgba(10,37,64,0.14);
+  background:#fff; color:#3A556E;
+  font-family:inherit; font-size:11px; font-weight:650; letter-spacing:0.04em;
+  cursor:pointer;
+}
+.logout-btn svg { width:14px; height:14px; stroke:currentColor; fill:none; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; flex-shrink:0; }
+
+.topbar {
+  position:absolute; left:var(--rail-w); right:0; top:0; height:52px;
+  display:flex; align-items:center; gap:16px; padding:0 24px;
+  background:linear-gradient(180deg, rgba(6,11,20,0.98), rgba(6,11,20,0.75));
+  border-bottom:1px solid rgba(239,68,68,0.12); z-index:15;
+}
+.crumbs { flex:1; font-size:12.5px; color:var(--muted); font-weight:500; }
+.crumbs b { color:#fff; font-weight:650; }
+.crumbs .sep { margin:0 7px; opacity:0.45; }
+.top-actions { display:flex; align-items:center; gap:10px; }
+.btn-ghost {
+  padding:6px 12px; border-radius:8px; font-size:11px; font-weight:650;
+  color:var(--muted); background:transparent; border:1px solid rgba(100,140,180,0.22);
+  letter-spacing:0.03em;
+}
+.btn-ghost.cyan { color:var(--cyan); border-color:rgba(0,163,224,0.35); }
+.pill {
+  display:inline-flex; align-items:center; gap:5px;
+  padding:3px 9px; border-radius:20px; font-size:10px; font-weight:750; letter-spacing:0.04em;
+}
+.pill.amber { background:rgba(245,158,11,0.14); color:#FBBF24; border:1px solid rgba(245,158,11,0.35); }
+.pill.red { background:rgba(239,68,68,0.14); color:#FCA5A5; border:1px solid rgba(239,68,68,0.4); }
+.pill.green { background:rgba(34,197,94,0.14); color:#86EFAC; border:1px solid rgba(34,197,94,0.35); }
+.pill.cyan { background:rgba(0,163,224,0.14); color:#7DD3FC; border:1px solid rgba(0,163,224,0.35); }
+
+.card {
+  background:var(--card); border:1px solid var(--border); border-radius:12px;
+}
+
+.main {
+  position:absolute; left:var(--rail-w); top:52px; right:0; bottom:0;
+  padding:8px 14px 8px;
+  display:grid; grid-template-columns: 1fr 280px; grid-template-rows: auto auto auto 1fr;
+  gap:8px; overflow:hidden;
+}
+.header-card {
+  grid-column: 1 / -1;
+  padding:10px 14px; display:flex; align-items:center; gap:12px;
+  background:linear-gradient(135deg, #1C1014 0%, #0C1626 55%, #0A1422 100%);
+  border:1px solid rgba(239,68,68,0.35);
+}
+.hdr-ico {
+  width:40px; height:40px; border-radius:11px;
+  background:rgba(239,68,68,0.14); color:#FCA5A5;
+  display:grid; place-items:center; border:1px solid rgba(239,68,68,0.4);
+}
+.hdr-ico svg { width:20px; height:20px; stroke:currentColor; fill:none; stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round; }
+.hdr-body { flex:1; min-width:0; }
+.hdr-kicker { font-size:9.5px; font-weight:750; letter-spacing:0.1em; text-transform:uppercase; color:#FCA5A5; margin-bottom:2px; }
+.hdr-body h1 { font-size:16px; font-weight:800; display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+.hdr-meta { font-size:11px; color:var(--muted); margin-top:3px; }
+.hdr-meta b { color:#C5D5E5; font-weight:650; }
+.hdr-side { text-align:right; flex-shrink:0; }
+.hdr-side .dates { font-size:12px; font-weight:700; color:#E8F1F8; }
+.hdr-side .cost { font-size:11px; color:var(--muted); margin-top:3px; }
+
+.kpi-row {
+  grid-column: 1 / -1;
+  display:grid; grid-template-columns: repeat(4, 1fr); gap:8px;
+}
+.kpi {
+  padding:10px 12px;
+  background:linear-gradient(180deg, #1A1218, #0F1A2A);
+  border:1px solid rgba(239,68,68,0.18); border-radius:12px;
+}
+.kpi .k { font-size:9.5px; font-weight:750; letter-spacing:0.08em; text-transform:uppercase; color:var(--muted); }
+.kpi .v { font-size:20px; font-weight:800; margin-top:4px; letter-spacing:-0.02em; }
+.kpi .s { font-size:11px; color:var(--muted); margin-top:2px; }
+.kpi .v.amber { color:#FBBF24; }
+.kpi .v.red { color:#FCA5A5; }
+.kpi .v.cyan { color:#7DD3FC; }
+
+.gantt-card {
+  grid-column: 1 / -1;
+  padding:10px 12px 8px;
+  display:flex; flex-direction:column; gap:6px; min-height:0;
+}
+.sec-label {
+  font-size:10px; font-weight:750; letter-spacing:0.08em; text-transform:uppercase; color:var(--muted);
+  display:flex; align-items:center; gap:10px;
+}
+.sec-label .hint { font-weight:500; letter-spacing:0; text-transform:none; color:#6A8299; }
+.gantt-months {
+  display:grid; grid-template-columns: 168px repeat(7, 1fr);
+  font-size:10px; font-weight:700; letter-spacing:0.04em; color:var(--muted); text-transform:uppercase;
+  padding:0 0 2px;
+}
+.gantt-months span { text-align:center; }
+.gantt-months .lab { text-align:left; padding-left:2px; }
+.gantt-row {
+  display:grid; grid-template-columns: 168px 1fr;
+  align-items:center; gap:8px; min-height:28px;
+}
+.gantt-row .name { font-size:11.5px; font-weight:650; color:#D0DCE8; }
+.gantt-row .name .sub { display:block; font-size:9.5px; font-weight:500; color:var(--muted); margin-top:1px; }
+.track {
+  position:relative; height:22px; background:rgba(8,14,24,0.55);
+  border-radius:6px; border:1px solid rgba(100,140,180,0.1);
+  overflow:hidden;
+}
+.bar {
+  position:absolute; top:3px; height:16px; border-radius:4px;
+  font-size:9px; font-weight:700; color:rgba(255,255,255,0.9);
+  display:flex; align-items:center; padding:0 6px; white-space:nowrap;
+}
+.bar.planned { background:rgba(100,140,180,0.28); border:1px solid rgba(100,140,180,0.35); color:#A8BCCE; top:2px; height:8px; }
+.bar.actual { top:11px; height:8px; }
+.bar.g { background:linear-gradient(90deg, #15803D, #22C55E); }
+.bar.a { background:linear-gradient(90deg, #B45309, #F59E0B); }
+.bar.r { background:linear-gradient(90deg, #B91C1C, #EF4444); }
+.bar.future { background:rgba(239,68,68,0.12); border:1px dashed rgba(239,68,68,0.4); color:#FCA5A5; top:3px; height:16px; }
+.today-line {
+  position:absolute; top:0; bottom:0; width:2px; background:#EF4444;
+  box-shadow:0 0 8px rgba(239,68,68,0.55); z-index:2; pointer-events:none;
+}
+.slip-mark {
+  position:absolute; top:0; bottom:0; background:rgba(239,68,68,0.12);
+  border-left:1px dashed rgba(239,68,68,0.45); z-index:1; pointer-events:none;
+}
+.legend {
+  display:flex; gap:14px; font-size:10px; color:var(--muted); margin-top:2px;
+}
+.legend i { display:inline-block; width:14px; height:6px; border-radius:2px; margin-right:5px; vertical-align:middle; }
+.legend i.p { background:rgba(100,140,180,0.4); }
+.legend i.g { background:#22C55E; }
+.legend i.a { background:#F59E0B; }
+.legend i.r { background:#EF4444; }
+.legend i.t { background:#EF4444; width:2px; height:10px; }
+
+.table-card {
+  grid-column: 1; grid-row: 4;
+  padding:0; overflow:hidden; display:flex; flex-direction:column; min-height:0;
+}
+.table-card .sec-label { padding:8px 12px 6px; }
+.ms-head {
+  display:grid; grid-template-columns: 1.55fr 0.7fr 0.55fr 0.55fr 0.55fr 0.4fr 0.45fr 1.1fr;
+  padding:5px 12px; font-size:9px; font-weight:700; letter-spacing:0.05em;
+  color:var(--muted); text-transform:uppercase; border-bottom:1px solid rgba(100,140,180,0.14);
+  background:rgba(8,14,24,0.35);
+}
+.ms-row {
+  display:grid; grid-template-columns: 1.55fr 0.7fr 0.55fr 0.55fr 0.55fr 0.4fr 0.45fr 1.1fr;
+  padding:7px 12px; align-items:center; gap:4px;
+  border-bottom:1px solid rgba(100,140,180,0.07);
+  font-size:11.5px;
+}
+.ms-row .title { font-weight:700; color:#E8F1F8; }
+.ms-row .muted { color:var(--muted); font-size:11px; }
+.ms-row .notes { font-size:10.5px; color:var(--muted); line-height:1.3; }
+.rag {
+  display:inline-flex; align-items:center; gap:4px;
+  padding:2px 7px; border-radius:10px; font-size:9.5px; font-weight:750; letter-spacing:0.03em;
+}
+.rag i { width:5px; height:5px; border-radius:50%; display:inline-block; }
+.rag.a { background:rgba(245,158,11,0.14); color:#FBBF24; border:1px solid rgba(245,158,11,0.35); }
+.rag.a i { background:var(--rag-a); }
+.rag.g { background:rgba(34,197,94,0.14); color:#86EFAC; border:1px solid rgba(34,197,94,0.35); }
+.rag.g i { background:var(--rag-g); }
+.rag.r { background:rgba(239,68,68,0.14); color:#FCA5A5; border:1px solid rgba(239,68,68,0.4); }
+.rag.r i { background:var(--rag-r); }
+.pct {
+  display:inline-block; min-width:36px; text-align:center;
+  padding:1px 5px; border-radius:4px; font-weight:750; font-size:10.5px;
+}
+.pct.g { background:rgba(34,197,94,0.14); color:#86EFAC; }
+.pct.a { background:rgba(245,158,11,0.14); color:#FBBF24; }
+.pct.r { background:rgba(239,68,68,0.14); color:#FCA5A5; }
+.pct.done { background:rgba(0,163,224,0.14); color:#7DD3FC; }
+
+.watch-card {
+  grid-column: 2; grid-row: 4;
+  padding:10px 12px; display:flex; flex-direction:column; gap:8px; min-height:0;
+  border-color:rgba(239,68,68,0.28) !important;
+}
+.watch-card h3 {
+  font-size:10px; font-weight:750; letter-spacing:0.08em; text-transform:uppercase; color:#FCA5A5;
+}
+.watch-list { list-style:none; display:flex; flex-direction:column; gap:8px; flex:1; }
+.watch-list li {
+  padding:8px 9px; border-radius:8px;
+  background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.28);
+  font-size:11.5px; line-height:1.35; color:#E8F1F8;
+}
+.watch-list li.amber {
+  background:rgba(245,158,11,0.08); border-color:rgba(245,158,11,0.25);
+}
+.watch-list li .tag {
+  display:inline-block; font-size:9px; font-weight:750; letter-spacing:0.06em;
+  color:#FCA5A5; text-transform:uppercase; margin-bottom:3px;
+}
+.watch-list li.amber .tag { color:#FBBF24; }
+.link-note {
+  margin-top:auto; padding:8px 9px; border-radius:8px;
+  background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.3);
+  font-size:11px; color:#FCA5A5; line-height:1.4;
+}
+.link-note b { color:#E8F1F8; font-weight:700; }
+.demo-foot { font-size:9.5px; color:#6A8299; margin-top:4px; }
+</style>
+<link rel="stylesheet" href="../nav.css"/>
+</head><body data-demo-site="oxford">
+
+<svg style="display:none">
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></symbol>
+  <symbol id="i-map" viewBox="0 0 24 24"><path d="M9 3l6 2 6-2v16l-6 2-6-2-6 2V5l6-2z"/><path d="M9 3v16M15 5v16"/></symbol>
+  <symbol id="i-people" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M2 19c0-3.5 3-6 7-6s7 2.5 7 6"/><circle cx="17" cy="9" r="2.5"/><path d="M22 19c0-2.5-2-4.5-5-5"/></symbol>
+  <symbol id="i-logout" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></symbol>
+  <symbol id="i-cam" viewBox="0 0 24 24"><path d="M3 7h12a2 2 0 012 2v8a2 2 0 01-2 2H3a2 2 0 01-2-2V9a2 2 0 012-2z"/><path d="M15 11l6-3v8l-6-3"/><circle cx="8.5" cy="12" r="2"/></symbol>
+  <symbol id="i-prog" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M3 10h18M8 2v4M16 2v4"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6l8-3z"/></symbol>
+  <symbol id="i-doc" viewBox="0 0 24 24"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5"/></symbol>
+  <symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 9a6 6 0 0112 0c0 7 2 7 2 9H4c0-2 2-2 2-9"/><path d="M10 20a2 2 0 004 0"/></symbol>
+</svg>
+
+<aside class="rail">
+  <div class="rail-brand">
+    <div class="logo-plate"><img src="tw-logo-128.png" alt="Thames Water"/></div>
+    <div class="brand-text">
+      <div class="org">Thames Water</div>
+      <div class="app">Project Assurance</div>
+    </div>
+  </div>
+  <div class="divider"></div>
+  <nav class="nav">
+    <div class="nav-label">Navigate</div>
+    <div class="nav-item" data-demo-nav="dashboard"><svg><use href="#i-home"/></svg>Site Dashboard</div>
+    <div class="nav-item" data-demo-nav="map"><svg><use href="#i-map"/></svg>Map</div>
+    <div class="nav-item" data-demo-nav="team"><svg><use href="#i-people"/></svg>Project team</div>
+    <div class="nav-item" data-demo-nav="visuals"><svg><use href="#i-cam"/></svg>Site visuals</div>
+    <div class="nav-item active" data-demo-nav="programme"><svg><use href="#i-prog"/></svg>Programme</div>
+    <div class="nav-item" data-demo-nav="assurance"><svg><use href="#i-shield"/></svg>Assurance</div>
+    <div class="nav-item" data-demo-nav="reports"><svg><use href="#i-doc"/></svg>Reports</div>
+    <div class="nav-item" data-demo-nav="alerts"><svg><use href="#i-bell"/></svg>Alerts</div>
+  </nav>
+  <div class="divider"></div>
+  <div class="rail-foot">
+    <div class="user-card">
+      <div class="avatar">JD</div>
+      <div class="user-meta">
+        <div class="name">Jane Doe</div>
+        <div class="role">Lead Assurance</div>
+      </div>
+    </div>
+    <button class="logout-btn" type="button" data-demo-nav="logout">
+      <svg><use href="#i-logout"/></svg>
+      Log out
+    </button>
+  </div>
+</aside>
+
+<header class="topbar">
+  <div class="crumbs">Map <span class="sep">/</span> Thames Valley &amp; HC <span class="sep">/</span> Oxford STW <span class="sep">/</span> <b>Programme</b></div>
+  <div class="top-actions">
+    <span class="btn-ghost">Baseline vs forecast</span>
+    <span class="btn-ghost cyan">Export programme</span>
+  </div>
+</header>
+
+<div class="main">
+  <div class="header-card card">
+    <div class="hdr-ico"><svg><use href="#i-prog"/></svg></div>
+    <div class="hdr-body">
+      <div class="hdr-kicker">Programme · Site schedule · stress case</div>
+      <h1>
+        Oxford STW — programme
+        <span class="pill red">RAG RED</span>
+        <span class="pill red">34% BEHIND</span>
+      </h1>
+      <div class="hdr-meta">Primary / secondary upgrade · <b>CMDP JV</b> · Early Works / Assurance · <b>Not official TW scores</b></div>
+    </div>
+    <div class="hdr-side">
+      <div class="dates">10/03/2026 – 30/04/2027</div>
+      <div class="cost">Scheme cost · £ TBC</div>
+    </div>
+  </div>
+
+  <div class="kpi-row">
+    <div class="kpi">
+      <div class="k">Overall progress</div>
+      <div class="v red">34%</div>
+      <div class="s">Scheme · behind programme</div>
+    </div>
+    <div class="kpi">
+      <div class="k">Planned vs actual</div>
+      <div class="v red">58% / 34%</div>
+      <div class="s">~24 pts behind baseline</div>
+    </div>
+    <div class="kpi">
+      <div class="k">Critical path items</div>
+      <div class="v red">3</div>
+      <div class="s">PST-2 · secondary dig · MEICA</div>
+    </div>
+    <div class="kpi">
+      <div class="k">Float / slip</div>
+      <div class="v red">−21 days</div>
+      <div class="s">PST-2 structural (~3 wks)</div>
+    </div>
+  </div>
+
+  <div class="gantt-card card">
+    <div class="sec-label">Timeline · Mar 2026 – Apr 2027 <span class="hint">Slipped critical path shown in red · CSS demo bars</span></div>
+    <div class="gantt-months">
+      <span class="lab">Phase</span><span>Mar</span><span>May</span><span>Jul</span><span>Sep</span><span>Nov</span><span>Jan</span><span>Mar+</span>
+    </div>
+    <div class="gantt-row">
+      <div class="name">Compound &amp; welfare<span class="sub">Complete</span></div>
+      <div class="track">
+        <div class="today-line" style="left:46%"></div>
+        <div class="bar planned" style="left:0%;width:8%"></div>
+        <div class="bar actual g" style="left:0%;width:8%"></div>
+      </div>
+    </div>
+    <div class="gantt-row">
+      <div class="name">Primary enabling<span class="sub">Complete</span></div>
+      <div class="track">
+        <div class="today-line" style="left:46%"></div>
+        <div class="bar planned" style="left:6%;width:16%"></div>
+        <div class="bar actual g" style="left:6%;width:16%"></div>
+      </div>
+    </div>
+    <div class="gantt-row">
+      <div class="name">PST-2 structural<span class="sub">−21d · critical</span></div>
+      <div class="track">
+        <div class="today-line" style="left:46%"></div>
+        <div class="slip-mark" style="left:38%;width:10%"></div>
+        <div class="bar planned" style="left:20%;width:22%"></div>
+        <div class="bar actual r" style="left:20%;width:28%"></div>
+      </div>
+    </div>
+    <div class="gantt-row">
+      <div class="name">Secondary excavation<span class="sub">GI hold · delayed</span></div>
+      <div class="track">
+        <div class="today-line" style="left:46%"></div>
+        <div class="slip-mark" style="left:46%;width:8%"></div>
+        <div class="bar planned" style="left:38%;width:16%"></div>
+        <div class="bar actual r" style="left:38%;width:10%"></div>
+      </div>
+    </div>
+    <div class="gantt-row">
+      <div class="name">MEICA / commissioning<span class="sub">At risk · future</span></div>
+      <div class="track">
+        <div class="today-line" style="left:46%"></div>
+        <div class="bar future" style="left:54%;width:46%">Baseline pushed</div>
+      </div>
+    </div>
+    <div class="legend">
+      <span><i class="p"></i>Planned</span>
+      <span><i class="g"></i>Actual done</span>
+      <span><i class="r"></i>Actual slipped</span>
+      <span><i class="a"></i>Amber watch</span>
+      <span><i class="t"></i>Today (~25 Sep)</span>
+    </div>
+  </div>
+
+  <div class="table-card card">
+    <div class="sec-label">Milestones · behind programme narrative</div>
+    <div class="ms-head">
+      <div>Milestone</div><div>Owner</div><div>Baseline start</div><div>Baseline finish</div><div>Forecast</div><div>%</div><div>RAG</div><div>Notes</div>
+    </div>
+    <div class="ms-row">
+      <div class="title">Compound &amp; welfare</div>
+      <div class="muted">CMDP</div>
+      <div class="muted">10/03</div>
+      <div class="muted">28/03</div>
+      <div class="muted">28/03</div>
+      <div><span class="pct done">100%</span></div>
+      <div><span class="rag g"><i></i>G</span></div>
+      <div class="notes">Complete</div>
+    </div>
+    <div class="ms-row">
+      <div class="title">Primary settlement enabling</div>
+      <div class="muted">CMDP</div>
+      <div class="muted">31/03</div>
+      <div class="muted">30/05</div>
+      <div class="muted">30/05</div>
+      <div><span class="pct done">100%</span></div>
+      <div><span class="rag g"><i></i>G</span></div>
+      <div class="notes">Complete · handed over</div>
+    </div>
+    <div class="ms-row">
+      <div class="title">PST-2 structural works</div>
+      <div class="muted">CMDP</div>
+      <div class="muted">02/06</div>
+      <div class="muted">29/08</div>
+      <div class="muted">19/09</div>
+      <div><span class="pct r">62%</span></div>
+      <div><span class="rag r"><i></i>R</span></div>
+      <div class="notes">~3 weeks behind · edge protection</div>
+    </div>
+    <div class="ms-row">
+      <div class="title">Secondary works excavation</div>
+      <div class="muted">CMDP</div>
+      <div class="muted">18/08</div>
+      <div class="muted">10/10</div>
+      <div class="muted">31/10</div>
+      <div><span class="pct r">28%</span></div>
+      <div><span class="rag r"><i></i>R</span></div>
+      <div class="notes">GI clarification · resource recovery</div>
+    </div>
+    <div class="ms-row">
+      <div class="title">MEICA install — secondary</div>
+      <div class="muted">CMDP</div>
+      <div class="muted">13/10</div>
+      <div class="muted">20/02</div>
+      <div class="muted">TBC</div>
+      <div><span class="pct a">0%</span></div>
+      <div><span class="rag a"><i></i>A</span></div>
+      <div class="notes">Start at risk · depends on dig</div>
+    </div>
+    <div class="ms-row">
+      <div class="title">Commissioning &amp; trial</div>
+      <div class="muted">TW / CMDP</div>
+      <div class="muted">01/03</div>
+      <div class="muted">30/04</div>
+      <div class="muted">TBC</div>
+      <div><span class="pct a">0%</span></div>
+      <div><span class="rag a"><i></i>A</span></div>
+      <div class="notes">Future · end date under review</div>
+    </div>
+  </div>
+
+  <div class="watch-card card">
+    <h3>Watch items · elevated</h3>
+    <ul class="watch-list">
+      <li>
+        <span class="tag">Red · critical path</span><br/>
+        PST-2 structural ~3 weeks behind baseline; temporary edge protection incomplete (escalated).
+      </li>
+      <li>
+        <span class="tag">Red · secondary dig</span><br/>
+        Excavation delayed pending ground investigation; labour 34 vs plan 48.
+      </li>
+      <li class="amber">
+        <span class="tag">Amber · compliance</span><br/>
+        Deep excavation RAMS under TW review · Inductions pending for 12 operatives.
+      </li>
+    </ul>
+    <div class="link-note">
+      Assurance stress · open RED observations + CMDP capacity under plan. Programme at risk through Q4 2026. Demo only.
+    </div>
+    <div class="demo-foot">Demo programme · not official TW data</div>
+  </div>
+</div>
+<script src="../nav.js"></script>
+</body></html>

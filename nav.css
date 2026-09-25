@@ -1,0 +1,60 @@
+/* Live-demo click affordances — do not alter 1440×900 artboard layout */
+.demo-clickable,
+.nav-item.demo-linked,
+.logout-btn.demo-linked,
+.rcard.demo-linked,
+.srow.demo-linked,
+.viewall.demo-linked,
+.dcard.demo-linked,
+.person.clickable.demo-linked,
+.cam-card.demo-linked,
+.cam-tile.demo-linked,
+.btn-open.demo-linked,
+.btn-ghost.demo-linked,
+.back-btn.demo-linked,
+.ncr-row.demo-linked,
+.queue-row.demo-linked,
+.pin-wrap.demo-linked {
+  cursor: pointer !important;
+}
+.rail .nav-item svg,
+.rail .logout-btn svg {
+  pointer-events: none;
+}
+.nav-item.demo-linked:hover {
+  background: rgba(0,156,222,0.10);
+}
+.rcard.demo-linked:hover {
+  outline: 2px solid rgba(0,180,240,0.65);
+  outline-offset: 2px;
+}
+.region-cards.demo-interactive {
+  pointer-events: auto !important;
+}
+.demo-badge {
+  position: fixed;
+  top: 10px;
+  right: 12px;
+  z-index: 99999;
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #0A2540;
+  background: rgba(255, 220, 80, 0.92);
+  border: 1px solid rgba(180, 140, 0, 0.45);
+  border-radius: 999px;
+  padding: 5px 12px;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+  pointer-events: none;
+  user-select: none;
+}
+/* Soften fixed artboard in browser: center on dark page bg */
+html.live-demo-shell {
+  background: #050810;
+}
+html.live-demo-shell body {
+  margin: 0 auto;
+  box-shadow: 0 0 0 1px rgba(255,255,255,0.04), 0 24px 80px rgba(0,0,0,0.55);
+}

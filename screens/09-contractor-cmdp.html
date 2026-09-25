@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg: #060B14;
+  --panel: #0A1220;
+  --card: #0F1A2A;
+  --card2: #122033;
+  --border: rgba(100,140,180,0.14);
+  --text: #E8F1F8;
+  --muted: #8AA0B5;
+  --cyan: #00A3E0;
+  --cyan2: #009CDE;
+  --rag-r: #EF4444;
+  --rag-a: #F59E0B;
+  --rag-g: #22C55E;
+  --navy: #0A2540;
+  --rail-w: 220px;
+  --font: Inter, "Segoe UI", system-ui, sans-serif;
+}
+* { box-sizing:border-box; margin:0; padding:0; }
+html, body { width:1440px; height:900px; overflow:hidden; font-family:var(--font); background:var(--bg); color:var(--text); }
+
+.rail {
+  position:absolute; left:0; top:0; bottom:0; width:var(--rail-w);
+  background:#FFFFFF; color:var(--navy);
+  display:flex; flex-direction:column; z-index:30;
+  box-shadow:4px 0 24px rgba(5,8,16,0.35);
+}
+.rail-brand { padding:16px 14px 14px; display:flex; align-items:center; gap:10px; }
+.logo-plate {
+  flex-shrink:0; width:48px; height:48px; border-radius:12px; background:#fff;
+  display:grid; place-items:center;
+  box-shadow:0 1px 0 rgba(10,37,64,0.06), 0 0 0 1px rgba(10,37,64,0.08);
+}
+.logo-plate img { width:40px; height:40px; border-radius:50%; display:block; }
+.brand-text .org { font-size:10.5px; font-weight:700; letter-spacing:0.08em; color:var(--navy); text-transform:uppercase; }
+.brand-text .app { font-size:11.5px; font-weight:600; color:#3A556E; margin-top:2px; }
+.divider { height:1px; margin:0 14px; background:var(--navy); opacity:0.18; }
+.nav { padding:12px 10px 8px; display:flex; flex-direction:column; gap:2px; flex:1; }
+.nav-label { font-size:9.5px; font-weight:700; letter-spacing:0.1em; color:#6A8299; text-transform:uppercase; padding:4px 10px 6px; }
+.nav-item {
+  display:flex; align-items:center; gap:10px;
+  padding:9px 10px; border-radius:10px;
+  font-size:11px; font-weight:650; letter-spacing:0.05em; text-transform:uppercase;
+  color:#3A556E;
+}
+.nav-item svg { width:17px; height:17px; stroke:currentColor; fill:none; stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round; flex-shrink:0; }
+.nav-item.active {
+  background:rgba(0,156,222,0.12); color:#0077A8; font-weight:750;
+  box-shadow:inset 0 0 0 1px rgba(0,156,222,0.35), inset 3px 0 0 #009CDE;
+}
+.rail-foot { padding:10px 12px 14px; }
+.user-card {
+  display:flex; align-items:center; gap:10px;
+  padding:9px 9px; border-radius:12px;
+  background:#F4F8FB; border:1px solid rgba(10,37,64,0.08);
+}
+.avatar {
+  width:32px; height:32px; border-radius:50%;
+  background:linear-gradient(135deg, #009CDE, #005A8C);
+  color:#fff; font-size:11px; font-weight:700; display:grid; place-items:center; flex-shrink:0;
+}
+.user-meta .name { font-size:12px; font-weight:650; color:var(--navy); }
+.user-meta .role { font-size:10.5px; color:#6A8299; margin-top:1px; }
+
+.topbar {
+  position:absolute; left:var(--rail-w); right:0; top:0; height:52px;
+  display:flex; align-items:center; gap:16px; padding:0 24px;
+  background:linear-gradient(180deg, rgba(6,11,20,0.98), rgba(6,11,20,0.75));
+  border-bottom:1px solid rgba(0,163,224,0.08); z-index:15;
+}
+.crumbs { flex:1; font-size:12.5px; color:var(--muted); font-weight:500; }
+.crumbs b { color:#fff; font-weight:650; }
+.crumbs .sep { margin:0 7px; opacity:0.45; }
+.top-actions { display:flex; align-items:center; gap:10px; }
+.btn-ghost {
+  padding:6px 12px; border-radius:8px; font-size:11px; font-weight:650;
+  color:var(--muted); background:transparent; border:1px solid rgba(100,140,180,0.22);
+  letter-spacing:0.03em;
+}
+.btn-ghost.cyan { color:var(--cyan); border-color:rgba(0,163,224,0.35); }
+
+.main {
+  position:absolute; left:var(--rail-w); top:52px; right:0; bottom:0;
+  padding:10px 16px 10px;
+  display:grid;
+  grid-template-columns: 1fr 300px;
+  grid-template-rows: auto auto 1fr;
+  gap:8px;
+  overflow:hidden;
+}
+.card {
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:12px;
+}
+
+.header-card {
+  grid-column:1 / -1;
+  padding:12px 16px;
+  display:grid;
+  grid-template-columns: auto 1fr auto;
+  gap:14px;
+  align-items:center;
+  background:linear-gradient(135deg, #0F1C2E 0%, #0C1626 55%, #0A1422 100%);
+  border:1px solid rgba(0,163,224,0.28);
+  box-shadow:0 0 0 1px rgba(0,163,224,0.06), inset 0 0 40px rgba(0,163,224,0.04);
+}
+.co-ico {
+  width:52px; height:52px; border-radius:12px;
+  background:linear-gradient(135deg, #B45309, #92400E);
+  color:#fff; display:grid; place-items:center; flex-shrink:0;
+  border:1px solid rgba(0,163,224,0.4);
+  box-shadow:0 0 18px rgba(0,163,224,0.18);
+  font-size:12px; font-weight:800; letter-spacing:0.06em;
+}
+.hdr-body { min-width:0; }
+.hdr-kicker {
+  font-size:10px; font-weight:750; letter-spacing:0.1em; text-transform:uppercase;
+  color:var(--cyan); margin-bottom:3px;
+}
+.hdr-body h1 {
+  font-size:18px; font-weight:800; letter-spacing:-0.02em; margin-bottom:6px;
+  display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+}
+.pill {
+  display:inline-flex; align-items:center; gap:5px;
+  padding:3px 9px; border-radius:20px; font-size:10px; font-weight:750; letter-spacing:0.04em;
+}
+.pill.role {
+  background:rgba(0,163,224,0.14); color:#7DD3FC;
+  border:1px solid rgba(0,163,224,0.35);
+}
+.pill.on {
+  background:rgba(34,197,94,0.14); color:#86EFAC;
+  border:1px solid rgba(34,197,94,0.35);
+}
+.pill.amber {
+  background:rgba(245,158,11,0.14); color:#FBBF24;
+  border:1px solid rgba(245,158,11,0.35);
+}
+.hdr-meta {
+  display:flex; flex-wrap:wrap; gap:12px 18px;
+  font-size:11.5px; color:var(--muted);
+}
+.hdr-meta .item { display:flex; align-items:center; gap:6px; }
+.hdr-meta .item b { color:#E8F1F8; font-weight:650; }
+.hdr-meta .item .dot { width:5px; height:5px; border-radius:50%; background:rgba(138,160,181,0.5); }
+.hdr-right { text-align:right; }
+.hdr-right .lab { font-size:9.5px; font-weight:700; letter-spacing:0.08em; color:var(--muted); text-transform:uppercase; }
+.hdr-right .pkg { margin-top:4px; font-size:13px; font-weight:700; color:var(--cyan); }
+.hdr-right .pkg-sub { font-size:11px; color:var(--muted); margin-top:2px; }
+
+.status-strip {
+  grid-column:1 / -1;
+  display:flex; align-items:center; gap:0;
+  padding:0; overflow:hidden;
+  background:var(--card2);
+}
+.ss-item {
+  flex:1; padding:8px 14px;
+  border-right:1px solid rgba(100,140,180,0.12);
+  display:flex; flex-direction:column; gap:3px;
+}
+.ss-item:last-child { border-right:none; }
+.ss-item .lab { font-size:9.5px; font-weight:700; letter-spacing:0.08em; color:var(--muted); text-transform:uppercase; }
+.ss-item .val { font-size:13px; font-weight:700; display:flex; align-items:center; gap:7px; }
+.ss-item .val i { width:7px; height:7px; border-radius:50%; display:inline-block; }
+.ss-item .val.g { color:#86EFAC; } .ss-item .val.g i { background:var(--rag-g); box-shadow:0 0 6px rgba(34,197,94,0.5); }
+.ss-item .val.a { color:#FBBF24; } .ss-item .val.a i { background:var(--rag-a); }
+.ss-item .val.n { color:#E8F1F8; }
+
+.col-left {
+  display:grid;
+  grid-template-rows: auto auto 1fr;
+  gap:8px;
+  min-height:0; overflow:hidden;
+}
+.panel { padding:10px 12px; min-height:0; }
+.panel-h {
+  display:flex; align-items:center; gap:8px; margin-bottom:7px;
+}
+.panel-h h3 {
+  font-size:10.5px; font-weight:750; letter-spacing:0.08em; text-transform:uppercase; color:var(--muted);
+}
+.panel-h .badge {
+  margin-left:auto; font-size:10px; font-weight:650; color:var(--cyan);
+  padding:2px 8px; border-radius:10px; background:rgba(0,163,224,0.1);
+  border:1px solid rgba(0,163,224,0.22);
+}
+.panel p, .panel .body {
+  font-size:11.5px; line-height:1.45; color:rgba(200,216,230,0.88);
+}
+.panel p + p { margin-top:6px; }
+.panel .lead { color:#E8F1F8; font-weight:600; }
+
+.cap-grid {
+  display:grid; grid-template-columns:repeat(3,1fr); gap:6px; margin-top:8px;
+}
+.cap {
+  padding:8px 10px; border-radius:8px;
+  background:rgba(8,14,24,0.6); border:1px solid rgba(100,140,180,0.12);
+}
+.cap .cl { font-size:9.5px; font-weight:700; letter-spacing:0.06em; color:var(--muted); text-transform:uppercase; }
+.cap .cv { font-size:13px; font-weight:750; color:#E8F1F8; margin-top:3px; }
+.cap .cs { font-size:10.5px; color:var(--muted); margin-top:2px; }
+
+.tags { display:flex; flex-wrap:wrap; gap:5px; margin-top:8px; }
+.tags span {
+  font-size:10px; font-weight:650; letter-spacing:0.03em;
+  padding:3px 8px; border-radius:6px;
+  background:rgba(100,140,180,0.1); color:var(--muted);
+  border:1px solid rgba(100,140,180,0.15);
+}
+.tags span.hi {
+  background:rgba(0,163,224,0.12); color:#7DD3FC; border-color:rgba(0,163,224,0.28);
+}
+
+table { width:100%; border-collapse:collapse; font-size:11.5px; }
+th {
+  text-align:left; font-size:9.5px; font-weight:700; letter-spacing:0.06em;
+  color:var(--muted); padding:0 6px 6px; text-transform:uppercase;
+}
+td { padding:6px 6px; border-top:1px solid rgba(100,140,180,0.10); vertical-align:middle; }
+td.muted { color:var(--muted); font-size:11px; }
+.status {
+  display:inline-flex; align-items:center; gap:5px;
+  font-size:11px; font-weight:600;
+}
+.status i { width:6px; height:6px; border-radius:50%; display:inline-block; }
+.status.g { color:#86EFAC; } .status.g i { background:var(--rag-g); }
+.status.a { color:#FBBF24; } .status.a i { background:var(--rag-a); }
+.status.c { color:#7DD3FC; } .status.c i { background:var(--cyan); }
+
+.check { font-size:13px; font-weight:700; }
+.check.g { color:#4ADE80; }
+.check.a { color:#FBBF24; }
+
+.comp-row {
+  display:grid; grid-template-columns:repeat(3,1fr); gap:6px;
+}
+.comp {
+  padding:9px 10px; border-radius:8px;
+  background:rgba(8,14,24,0.6); border:1px solid rgba(100,140,180,0.12);
+  display:flex; gap:10px; align-items:center;
+}
+.comp .ico {
+  width:30px; height:30px; border-radius:8px; display:grid; place-items:center; flex-shrink:0;
+  background:rgba(34,197,94,0.14); color:#86EFAC; font-weight:800; font-size:14px;
+}
+.comp .ico.warn { background:rgba(245,158,11,0.14); color:#FBBF24; }
+.comp .cl { font-size:10px; font-weight:700; letter-spacing:0.05em; color:var(--muted); text-transform:uppercase; }
+.comp .cv { font-size:12.5px; font-weight:700; color:#E8F1F8; margin-top:1px; }
+
+.col-right {
+  display:flex; flex-direction:column; gap:8px; min-height:0;
+}
+.contacts-panel {
+  padding:10px;
+  background:linear-gradient(180deg, #122033 0%, #0F1A2A 100%);
+  border:1px solid rgba(0,163,224,0.22);
+  box-shadow:0 0 24px rgba(0,163,224,0.06);
+  display:flex; flex-direction:column;
+}
+.contacts-panel .dp-h {
+  font-size:11px; font-weight:750; letter-spacing:0.08em; text-transform:uppercase;
+  color:var(--cyan); margin-bottom:4px;
+}
+.contacts-panel .dp-sub {
+  font-size:11px; color:var(--muted); margin-bottom:10px; line-height:1.35;
+}
+.contact-card {
+  display:flex; gap:10px; align-items:flex-start;
+  padding:7px 9px; border-radius:9px; margin-bottom:5px;
+  background:rgba(8,14,24,0.55); border:1px solid rgba(100,140,180,0.12);
+}
+.contact-card .av {
+  width:32px; height:32px; border-radius:50%; flex-shrink:0;
+  display:grid; place-items:center; font-size:10px; font-weight:750; color:#fff;
+  background:linear-gradient(135deg, #0E7490, #155E75);
+}
+.contact-card .nm { font-size:12.5px; font-weight:700; color:#E8F1F8; }
+.contact-card .rl { font-size:10.5px; color:var(--cyan); font-weight:650; margin-top:1px; }
+.contact-card .em { font-size:10.5px; color:var(--muted); margin-top:3px; line-height:1.35; }
+.btn-note {
+  margin-top:8px; padding-top:8px;
+  font-size:10px; color:rgba(138,160,181,0.7); line-height:1.4;
+  border-top:1px solid rgba(100,140,180,0.12);
+}
+
+.related { padding:8px 10px; }
+.related .r-h {
+  font-size:10px; font-weight:750; letter-spacing:0.08em; text-transform:uppercase;
+  color:var(--muted); margin-bottom:8px;
+}
+.rel-link {
+  display:flex; align-items:center; gap:10px;
+  padding:6px 8px; border-radius:8px; margin-bottom:4px;
+  background:rgba(8,14,24,0.55); border:1px solid rgba(100,140,180,0.12);
+  text-decoration:none; color:inherit;
+}
+.rel-link:last-child { margin-bottom:0; }
+.rel-link .rico {
+  width:28px; height:28px; border-radius:7px; display:grid; place-items:center; flex-shrink:0;
+  font-size:10px; font-weight:800;
+}
+.rel-link .rico.scheme { background:rgba(0,163,224,0.15); color:#7DD3FC; }
+.rel-link .rico.team { background:rgba(34,197,94,0.15); color:#86EFAC; }
+.rel-link .rt { font-size:12px; font-weight:650; color:#E8F1F8; }
+.rel-link .rm { font-size:10.5px; color:var(--muted); margin-top:1px; }
+.rel-link .arr { margin-left:auto; color:var(--cyan); font-size:14px; font-weight:700; }
+
+.logout-btn {
+  display:flex; align-items:center; justify-content:center; gap:7px;
+  width:100%; margin-top:8px; padding:7px 10px;
+  border-radius:9px; border:1px solid rgba(10,37,64,0.14);
+  background:#fff; color:#3A556E;
+  font-family:inherit; font-size:11px; font-weight:650; letter-spacing:0.04em;
+  cursor:pointer;
+}
+.logout-btn svg { width:14px; height:14px; stroke:currentColor; fill:none; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; flex-shrink:0; }
+.logout-btn:hover { background:#F4F8FB; color:var(--navy); border-color:rgba(10,37,64,0.22); }
+</style>
+<link rel="stylesheet" href="../nav.css"/>
+</head><body data-demo-site="oxford">
+
+<svg style="display:none">
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></symbol>
+  <symbol id="i-map" viewBox="0 0 24 24"><path d="M9 3l6 2 6-2v16l-6 2-6-2-6 2V5l6-2z"/><path d="M9 3v16M15 5v16"/></symbol>
+  <symbol id="i-prog" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M3 10h18M8 2v4M16 2v4"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6l8-3z"/></symbol>
+  <symbol id="i-doc" viewBox="0 0 24 24"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5"/></symbol>
+  <symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 9a6 6 0 0112 0c0 7 2 7 2 9H4c0-2 2-2 2-9"/><path d="M10 20a2 2 0 004 0"/></symbol>
+  <symbol id="i-people" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M2 19c0-3.5 3-6 7-6s7 2.5 7 6"/><circle cx="17" cy="9" r="2.5"/><path d="M22 19c0-2.5-2-4.5-5-5"/></symbol>
+  <symbol id="i-logout" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></symbol>
+  <symbol id="i-cam" viewBox="0 0 24 24"><path d="M3 7h12a2 2 0 012 2v8a2 2 0 01-2 2H3a2 2 0 01-2-2V9a2 2 0 012-2z"/><path d="M15 11l6-3v8l-6-3"/><circle cx="8.5" cy="12" r="2"/></symbol>
+</svg>
+
+<aside class="rail">
+  <div class="rail-brand">
+    <div class="logo-plate"><img src="tw-logo-128.png" alt="Thames Water"/></div>
+    <div class="brand-text">
+      <div class="org">Thames Water</div>
+      <div class="app">Project Assurance</div>
+    </div>
+  </div>
+  <div class="divider"></div>
+  <nav class="nav">
+        <div class="nav-label">Navigate</div>
+    <div class="nav-item" data-demo-nav="dashboard"><svg><use href="#i-home"/></svg>Site Dashboard</div>
+    <div class="nav-item" data-demo-nav="map"><svg><use href="#i-map"/></svg>Map</div>
+    <div class="nav-item active" data-demo-nav="team"><svg><use href="#i-people"/></svg>Project team</div>
+    <div class="nav-item" data-demo-nav="visuals"><svg><use href="#i-cam"/></svg>Site visuals</div>
+    <div class="nav-item" data-demo-nav="programme"><svg><use href="#i-prog"/></svg>Programme</div>
+    <div class="nav-item" data-demo-nav="assurance"><svg><use href="#i-shield"/></svg>Assurance</div>
+    <div class="nav-item" data-demo-nav="reports"><svg><use href="#i-doc"/></svg>Reports</div>
+    <div class="nav-item" data-demo-nav="alerts"><svg><use href="#i-bell"/></svg>Alerts</div>
+  </nav>
+  <div class="divider"></div>
+    <div class="rail-foot">
+    <div class="user-card">
+      <div class="avatar">JD</div>
+      <div class="user-meta">
+        <div class="name">Jane Doe</div>
+        <div class="role">Lead Assurance</div>
+      </div>
+    </div>
+    <button class="logout-btn" type="button" data-demo-nav="logout">
+      <svg><use href="#i-logout"/></svg>
+      Log out
+    </button>
+  </div>
+</aside>
+
+<header class="topbar">
+  <div class="crumbs">
+    Map <span class="sep">/</span> Thames Valley <span class="sep">/</span> Oxford STW <span class="sep">/</span> <b>CMDP JV</b>
+  </div>
+  <div class="top-actions">
+    <span class="btn-ghost">← Back to Oxford</span>
+    <span class="btn-ghost cyan">Open scheme</span>
+  </div>
+</header>
+
+<div class="main">
+  <div class="header-card card">
+    <div class="co-ico">CMDP</div>
+    <div class="hdr-body">
+      <div class="hdr-kicker">Lead contractor · Contractor profile</div>
+      <h1>
+        CMDP JV
+        <span class="pill role">Lead contractor — primary / secondary upgrade</span>
+        <span class="pill amber">RAMS REVIEW</span>
+        <span class="pill amber">Oxford AMP8 · RED</span>
+      </h1>
+      <div class="hdr-meta">
+        <div class="item"><span class="dot"></span>Package lead <b>Nina Okonkwo</b></div>
+        <div class="item"><span class="dot"></span>Scheme <b>TW-OXF-AMP8-001</b></div>
+        <div class="item"><span class="dot"></span>Package <b>Primary / Secondary Upgrade</b></div>
+        <div class="item"><span class="dot"></span>Mobilised <b>Jan 2025</b></div>
+      </div>
+    </div>
+    <div class="hdr-right">
+      <div class="lab">Linked scheme</div>
+      <div class="pkg">TW-OXF-AMP8-001</div>
+      <div class="pkg-sub">Oxford STW · AMP8 major upgrade</div>
+    </div>
+  </div>
+
+  <div class="status-strip card">
+    <div class="ss-item">
+      <div class="lab">Site status</div>
+      <div class="val a"><i></i>On Site · RAMS review</div>
+    </div>
+    <div class="ss-item">
+      <div class="lab">Workforce band</div>
+      <div class="val n">90–140 on site</div>
+    </div>
+    <div class="ss-item">
+      <div class="lab">Disciplines</div>
+      <div class="val n">Civils · Process · MEICA</div>
+    </div>
+    <div class="ss-item">
+      <div class="lab">Compliance</div>
+      <div class="val a"><i></i>RAMS amber · Ind pending</div>
+    </div>
+    <div class="ss-item">
+      <div class="lab">TW history</div>
+      <div class="val n">5 prior / current schemes</div>
+    </div>
+  </div>
+
+  <div class="col-left">
+    <div class="panel card">
+      <div class="panel-h">
+        <h3>Company overview</h3>
+        <span class="badge">Tier-1 · AMP8 framework</span>
+      </div>
+            <p class="lead">CMDP JV is the lead contractor for Oxford STW AMP8 major upgrade (primary / secondary treatment package), mobilised January 2025 under the Thames Water capital delivery framework. Joint venture delivering process civils and MEICA interfaces across the Thames Valley catchment.</p>
+      <p>Scope covers primary clarifier and secondary treatment train upgrades, sludge thickening interfaces, and site-wide MEICA renewals. Package lead Nina Okonkwo sits in the Oxford site office and reports into the TW Project Manager (Helen Briggs). Compliance currently amber (RAMS under review) — aligned with the Oxford RED stress board.</p>
+      <div class="tags">
+        <span class="hi">Primary / Secondary</span>
+        <span class="hi">Process civils</span>
+        <span>MEICA interfaces</span>
+        <span>AMP8 framework</span>
+        <span class="hi">RAMS review</span>
+      </div>
+    </div>
+
+    <div class="panel card">
+      <div class="panel-h"><h3>Capacity on this scheme</h3></div>
+      <div class="cap-grid">
+        <div class="cap">
+          <div class="cl">Workforce</div>
+          <div class="cv">90–140</div>
+          <div class="cs">Peak band · 18 under plan</div>
+        </div>
+        <div class="cap">
+          <div class="cl">Supervisors</div>
+          <div class="cv">14</div>
+          <div class="cs">Incl. process lead</div>
+        </div>
+        <div class="cap">
+          <div class="cl">Plant / plant hire</div>
+          <div class="cv">Heavy</div>
+          <div class="cs">Cranes · digesters · MEICA lift</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel card" style="overflow:hidden; display:flex; flex-direction:column;">
+      <div class="panel-h">
+        <h3>TW work history</h3>
+        <span class="badge">Demo · 5 schemes</span>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Scheme</th>
+            <th>Site / region</th>
+            <th>Role</th>
+            <th>Period</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>TW-OXF-AMP8-001</td>
+            <td class="muted">Oxford STW · TV&amp;HC</td>
+            <td class="muted">Lead · Primary / Secondary</td>
+            <td class="muted">2025–ongoing</td>
+            <td><span class="status a"><i></i> Current · stressed</span></td>
+          </tr>
+          <tr>
+            <td>TW-FMR-AMP8-003</td>
+            <td class="muted">Farmoor · TV&amp;HC</td>
+            <td class="muted">Lead · Process civils</td>
+            <td class="muted">2024–ongoing</td>
+            <td><span class="status c"><i></i> Live (other)</span></td>
+          </tr>
+          <tr>
+            <td>TW-WHT-AMP7-011</td>
+            <td class="muted">White Horse · TV&amp;HC</td>
+            <td class="muted">JV · Inlet &amp; storm</td>
+            <td class="muted">2021–2023</td>
+            <td><span class="status g"><i></i> Complete</span></td>
+          </tr>
+          <tr>
+            <td>TW-RDG-AMP7-006</td>
+            <td class="muted">Reading STW · TV&amp;HC</td>
+            <td class="muted">Secondary upgrade</td>
+            <td class="muted">2019–2022</td>
+            <td><span class="status g"><i></i> Complete</span></td>
+          </tr>
+          <tr>
+            <td>TW-MPL-AMP7-002</td>
+            <td class="muted">Maple Lodge · TV&amp;HC</td>
+            <td class="muted">MEICA package</td>
+            <td class="muted">2018–2020</td>
+            <td><span class="status g"><i></i> Complete</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="col-right">
+    <div class="contacts-panel card">
+      <div class="dp-h">Key contacts at CMDP JV</div>
+      <div class="dp-sub">For this Oxford package — demo placeholders, not official TW directory.</div>
+      <div class="contact-card">
+        <div class="av">NO</div>
+        <div>
+          <div class="nm">Nina Okonkwo</div>
+          <div class="rl">Package lead · Primary / Secondary</div>
+          <div class="em">n.okonkwo@cmdp.example<br/>+44 1865 320 xxx</div>
+        </div>
+      </div>
+      <div class="contact-card">
+        <div class="av">AP</div>
+        <div>
+          <div class="nm">Aisha Patel</div>
+          <div class="rl">Site QS / commercial</div>
+          <div class="em">a.patel@cmdp.example<br/>+44 1865 320 xxx</div>
+        </div>
+      </div>
+      <div class="contact-card">
+        <div class="av">MC</div>
+        <div>
+          <div class="nm">Marcus Chen</div>
+          <div class="rl">HSEQ lead · site</div>
+          <div class="em">m.chen@cmdp.example<br/>+44 1865 320 xxx</div>
+        </div>
+      </div>
+      <div class="btn-note">Demo placeholder data — not official Thames Water contacts, scores, or contractor records. Names are illustrative only.</div>
+    </div>
+
+    <div class="panel card" style="padding:8px 10px">
+      <div class="panel-h" style="margin-bottom:5px"><h3>Compliance snapshot</h3></div>
+      <div class="comp-row" style="grid-template-columns:repeat(3,1fr); gap:5px">
+        <div class="comp" style="padding:6px 7px; flex-direction:column; align-items:flex-start; gap:4px">
+          <div style="display:flex;align-items:center;gap:6px">
+            <div class="ico warn" style="width:22px;height:22px;font-size:11px;border-radius:6px">!</div>
+            <div class="cl">RAMS</div>
+          </div>
+          <div class="cv" style="font-size:11px;color:#FBBF24">Under review</div>
+        </div>
+        <div class="comp" style="padding:6px 7px; flex-direction:column; align-items:flex-start; gap:4px">
+          <div style="display:flex;align-items:center;gap:6px">
+            <div class="ico" style="width:22px;height:22px;font-size:11px;border-radius:6px">✓</div>
+            <div class="cl">Ins</div>
+          </div>
+          <div class="cv" style="font-size:11px">Valid</div>
+        </div>
+        <div class="comp" style="padding:6px 7px; flex-direction:column; align-items:flex-start; gap:4px">
+          <div style="display:flex;align-items:center;gap:6px">
+            <div class="ico warn" style="width:22px;height:22px;font-size:11px;border-radius:6px">!</div>
+            <div class="cl">Ind</div>
+          </div>
+          <div class="cv" style="font-size:11px;color:#FBBF24">Pending</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="related card">
+      <div class="r-h">Related</div>
+      <a class="rel-link" href="#">
+        <div class="rico scheme">SCH</div>
+        <div>
+          <div class="rt">TW-OXF-AMP8-001</div>
+          <div class="rm">Oxford STW · Site dashboard</div>
+        </div>
+        <span class="arr">→</span>
+      </a>
+      <a class="rel-link" href="#">
+        <div class="rico team">TEAM</div>
+        <div>
+          <div class="rt">Project team &amp; contacts</div>
+          <div class="rm">Back to Oxford core four</div>
+        </div>
+        <span class="arr">→</span>
+      </a>
+    </div>
+  </div>
+</div>
+
+<script src="../nav.js"></script>
+</body></html>

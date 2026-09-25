@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg: #060B14; --panel: #0A1220; --card: #0F1A2A; --card2: #122033;
+  --border: rgba(100,140,180,0.14); --text: #E8F1F8; --muted: #8AA0B5;
+  --cyan: #00A3E0; --cyan2: #009CDE; --rag-r: #EF4444; --rag-a: #F59E0B; --rag-g: #22C55E;
+  --navy: #0A2540; --rail-w: 220px; --font: Inter, "Segoe UI", system-ui, sans-serif;
+}
+* { box-sizing:border-box; margin:0; padding:0; }
+html, body { width:1440px; height:900px; overflow:hidden; font-family:var(--font); background:var(--bg); color:var(--text); }
+
+.rail {
+  position:absolute; left:0; top:0; bottom:0; width:var(--rail-w);
+  background:#FFFFFF; color:var(--navy);
+  display:flex; flex-direction:column; z-index:30;
+  box-shadow:4px 0 24px rgba(5,8,16,0.35);
+}
+.rail-brand { padding:16px 14px 14px; display:flex; align-items:center; gap:10px; }
+.logo-plate {
+  flex-shrink:0; width:48px; height:48px; border-radius:12px; background:#fff;
+  display:grid; place-items:center;
+  box-shadow:0 1px 0 rgba(10,37,64,0.06), 0 0 0 1px rgba(10,37,64,0.08);
+}
+.logo-plate img { width:40px; height:40px; border-radius:50%; display:block; }
+.brand-text .org { font-size:10.5px; font-weight:700; letter-spacing:0.08em; color:var(--navy); text-transform:uppercase; }
+.brand-text .app { font-size:11.5px; font-weight:600; color:#3A556E; margin-top:2px; }
+.divider { height:1px; margin:0 14px; background:var(--navy); opacity:0.18; }
+.nav { padding:12px 10px 8px; display:flex; flex-direction:column; gap:2px; flex:1; }
+.nav-label { font-size:9.5px; font-weight:700; letter-spacing:0.1em; color:#6A8299; text-transform:uppercase; padding:4px 10px 6px; }
+.nav-item {
+  display:flex; align-items:center; gap:10px;
+  padding:9px 10px; border-radius:10px;
+  font-size:11px; font-weight:650; letter-spacing:0.05em; text-transform:uppercase;
+  color:#3A556E;
+}
+.nav-item svg { width:17px; height:17px; stroke:currentColor; fill:none; stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round; flex-shrink:0; }
+.nav-item.active {
+  background:rgba(0,156,222,0.12); color:#0077A8; font-weight:750;
+  box-shadow:inset 0 0 0 1px rgba(0,156,222,0.35), inset 3px 0 0 #009CDE;
+}
+.rail-foot { padding:10px 12px 14px; }
+.user-card {
+  display:flex; align-items:center; gap:10px;
+  padding:9px 9px; border-radius:12px;
+  background:#F4F8FB; border:1px solid rgba(10,37,64,0.08);
+}
+.avatar {
+  width:32px; height:32px; border-radius:50%;
+  background:linear-gradient(135deg, #009CDE, #005A8C);
+  color:#fff; font-size:11px; font-weight:700; display:grid; place-items:center; flex-shrink:0;
+}
+.user-meta .name { font-size:12px; font-weight:650; color:var(--navy); }
+.user-meta .role { font-size:10.5px; color:#6A8299; margin-top:1px; }
+.logout-btn {
+  display:flex; align-items:center; justify-content:center; gap:7px;
+  width:100%; margin-top:8px; padding:7px 10px;
+  border-radius:9px; border:1px solid rgba(10,37,64,0.14);
+  background:#fff; color:#3A556E;
+  font-family:inherit; font-size:11px; font-weight:650; letter-spacing:0.04em;
+  cursor:pointer;
+}
+.logout-btn svg { width:14px; height:14px; stroke:currentColor; fill:none; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; flex-shrink:0; }
+
+.topbar {
+  position:absolute; left:var(--rail-w); right:0; top:0; height:52px;
+  display:flex; align-items:center; gap:16px; padding:0 24px;
+  background:linear-gradient(180deg, rgba(6,11,20,0.98), rgba(6,11,20,0.75));
+  border-bottom:1px solid rgba(0,163,224,0.08); z-index:15;
+}
+.crumbs { flex:1; font-size:12.5px; color:var(--muted); font-weight:500; }
+.crumbs b { color:#fff; font-weight:650; }
+.crumbs .sep { margin:0 7px; opacity:0.45; }
+.top-actions { display:flex; align-items:center; gap:10px; }
+.btn-ghost {
+  padding:6px 12px; border-radius:8px; font-size:11px; font-weight:650;
+  color:var(--muted); background:transparent; border:1px solid rgba(100,140,180,0.22);
+  letter-spacing:0.03em;
+}
+.btn-ghost.cyan { color:var(--cyan); border-color:rgba(0,163,224,0.35); }
+.pill {
+  display:inline-flex; align-items:center; gap:5px;
+  padding:3px 9px; border-radius:20px; font-size:10px; font-weight:750; letter-spacing:0.04em;
+}
+.pill.amber { background:rgba(245,158,11,0.14); color:#FBBF24; border:1px solid rgba(245,158,11,0.35); }
+.pill.red { background:rgba(239,68,68,0.14); color:#FCA5A5; border:1px solid rgba(239,68,68,0.4); }
+.pill.cyan { background:rgba(0,163,224,0.14); color:#7DD3FC; border:1px solid rgba(0,163,224,0.35); }
+
+.card {
+  background:var(--card); border:1px solid var(--border); border-radius:12px;
+}
+
+.main {
+  position:absolute; left:var(--rail-w); top:52px; right:0; bottom:0;
+  padding:8px 14px 8px;
+  display:grid; grid-template-columns: 1.15fr 1fr; grid-template-rows: auto auto 1fr auto;
+  gap:8px; overflow:hidden;
+}
+
+.hero-card {
+  grid-column: 1 / -1;
+  padding:12px 16px; display:flex; align-items:center; gap:16px;
+  background:linear-gradient(135deg, #1A1218 0%, #0F1A2A 45%, #0C1626 100%);
+  border:1px solid rgba(239,68,68,0.45);
+  box-shadow:0 0 0 1px rgba(239,68,68,0.08), inset 0 0 40px rgba(239,68,68,0.05);
+}
+.score-ring {
+  width:72px; height:72px; border-radius:50%; flex-shrink:0;
+  background: conic-gradient(#EF4444 0 28%, rgba(255,255,255,0.08) 0);
+  display:grid; place-items:center; position:relative;
+  box-shadow:0 0 24px rgba(239,68,68,0.35);
+}
+.score-ring::after {
+  content:""; position:absolute; inset:8px; border-radius:50%; background:#0A1220;
+}
+.score-ring span { position:relative; z-index:1; font-size:16px; font-weight:800; color:#FCA5A5; }
+.hero-body { flex:1; min-width:0; }
+.hero-kicker { font-size:9.5px; font-weight:750; letter-spacing:0.1em; text-transform:uppercase; color:#FCA5A5; margin-bottom:2px; }
+.hero-body h1 { font-size:17px; font-weight:800; display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+.hero-meta { font-size:11.5px; color:var(--muted); margin-top:4px; }
+.hero-meta b { color:#C5D5E5; font-weight:650; }
+.kpi-chips { display:flex; gap:8px; flex-shrink:0; }
+.kpi-chip {
+  padding:8px 12px; border-radius:10px; min-width:78px; text-align:center;
+  background:rgba(8,14,24,0.55); border:1px solid rgba(100,140,180,0.16);
+}
+.kpi-chip .k { font-size:9px; font-weight:750; letter-spacing:0.06em; text-transform:uppercase; color:var(--muted); }
+.kpi-chip .v { font-size:18px; font-weight:800; margin-top:2px; }
+.kpi-chip .v.a { color:#FBBF24; }
+.kpi-chip .v.r { color:#FCA5A5; }
+.kpi-chip .v.c { color:#7DD3FC; }
+
+.sec-label {
+  font-size:10px; font-weight:750; letter-spacing:0.08em; text-transform:uppercase; color:var(--muted);
+  display:flex; align-items:center; justify-content:space-between; padding:0 2px 6px;
+}
+.sec-label .link { color:var(--cyan); font-weight:650; letter-spacing:0.03em; text-transform:none; font-size:10.5px; }
+
+.panel {
+  padding:10px 12px; display:flex; flex-direction:column; min-height:0; overflow:hidden;
+}
+.panel.decisions { grid-column:1; grid-row:2; }
+.panel.ncrs { grid-column:2; grid-row:2; }
+.panel.holds { grid-column:1; grid-row:3; }
+.panel.hso { grid-column:2; grid-row:3; }
+.panel.activity { grid-column:1 / -1; grid-row:4; }
+
+.row {
+  display:grid; grid-template-columns: auto 1fr auto auto;
+  gap:10px; align-items:center;
+  padding:7px 10px; border-radius:9px; margin-bottom:5px;
+  background:linear-gradient(180deg, #122033, #0F1A2A);
+  border:1px solid rgba(100,140,180,0.12);
+}
+.row:last-child { margin-bottom:0; }
+.row.clickable { border-color:rgba(239,68,68,0.4); box-shadow:inset 3px 0 0 #EF4444; }
+.row.crit { box-shadow:inset 3px 0 0 #EF4444; border-color:rgba(239,68,68,0.3); }
+.badge {
+  padding:2px 7px; border-radius:8px; font-size:9px; font-weight:750; letter-spacing:0.04em; text-transform:uppercase;
+}
+.badge.over { background:rgba(239,68,68,0.16); color:#FCA5A5; border:1px solid rgba(239,68,68,0.4); }
+.badge.hold { background:rgba(245,158,11,0.14); color:#FBBF24; border:1px solid rgba(245,158,11,0.35); }
+.badge.crit-hold { background:rgba(239,68,68,0.18); color:#FCA5A5; border:1px solid rgba(239,68,68,0.5); }
+.badge.open { background:rgba(0,163,224,0.14); color:#7DD3FC; border:1px solid rgba(0,163,224,0.35); }
+.badge.comp { background:rgba(245,158,11,0.14); color:#FBBF24; border:1px solid rgba(245,158,11,0.35); }
+.row .title { font-size:12px; font-weight:700; color:#E8F1F8; }
+.row .sub { font-size:10.5px; color:var(--muted); margin-top:1px; }
+.row .sub b { color:#C5D5E5; font-weight:650; }
+.row .meta { font-size:10.5px; color:var(--muted); text-align:right; white-space:nowrap; }
+.row .meta b { display:block; color:#FBBF24; font-weight:700; }
+.row .meta b.r { color:#FCA5A5; }
+.affordance {
+  padding:4px 10px; border-radius:7px; font-size:10.5px; font-weight:700;
+  color:var(--cyan); background:rgba(0,163,224,0.1);
+  border:1px solid rgba(0,163,224,0.35); white-space:nowrap;
+}
+
+.act-row {
+  display:grid; grid-template-columns: 90px 1fr auto;
+  gap:10px; align-items:center;
+  padding:5px 8px; border-bottom:1px solid rgba(100,140,180,0.08);
+  font-size:11.5px;
+}
+.act-row:last-child { border-bottom:none; }
+.act-row .when { font-size:10.5px; color:var(--muted); font-weight:650; }
+.act-row .what { color:#E8F1F8; }
+.act-row .what b { color:#FCA5A5; }
+.act-row .who { font-size:10.5px; color:var(--muted); }
+.demo-foot { font-size:9.5px; color:#6A8299; margin-top:3px; text-align:right; }
+</style>
+<link rel="stylesheet" href="../nav.css"/>
+</head><body data-demo-site="oxford">
+
+<svg style="display:none">
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></symbol>
+  <symbol id="i-map" viewBox="0 0 24 24"><path d="M9 3l6 2 6-2v16l-6 2-6-2-6 2V5l6-2z"/><path d="M9 3v16M15 5v16"/></symbol>
+  <symbol id="i-people" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M2 19c0-3.5 3-6 7-6s7 2.5 7 6"/><circle cx="17" cy="9" r="2.5"/><path d="M22 19c0-2.5-2-4.5-5-5"/></symbol>
+  <symbol id="i-logout" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></symbol>
+  <symbol id="i-cam" viewBox="0 0 24 24"><path d="M3 7h12a2 2 0 012 2v8a2 2 0 01-2 2H3a2 2 0 01-2-2V9a2 2 0 012-2z"/><path d="M15 11l6-3v8l-6-3"/><circle cx="8.5" cy="12" r="2"/></symbol>
+  <symbol id="i-prog" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M3 10h18M8 2v4M16 2v4"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6l8-3z"/></symbol>
+  <symbol id="i-doc" viewBox="0 0 24 24"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5"/></symbol>
+  <symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 9a6 6 0 0112 0c0 7 2 7 2 9H4c0-2 2-2 2-9"/><path d="M10 20a2 2 0 004 0"/></symbol>
+</svg>
+
+<aside class="rail">
+  <div class="rail-brand">
+    <div class="logo-plate"><img src="tw-logo-128.png" alt="Thames Water"/></div>
+    <div class="brand-text">
+      <div class="org">Thames Water</div>
+      <div class="app">Project Assurance</div>
+    </div>
+  </div>
+  <div class="divider"></div>
+  <nav class="nav">
+    <div class="nav-label">Navigate</div>
+    <div class="nav-item" data-demo-nav="dashboard"><svg><use href="#i-home"/></svg>Site Dashboard</div>
+    <div class="nav-item" data-demo-nav="map"><svg><use href="#i-map"/></svg>Map</div>
+    <div class="nav-item" data-demo-nav="team"><svg><use href="#i-people"/></svg>Project team</div>
+    <div class="nav-item" data-demo-nav="visuals"><svg><use href="#i-cam"/></svg>Site visuals</div>
+    <div class="nav-item" data-demo-nav="programme"><svg><use href="#i-prog"/></svg>Programme</div>
+    <div class="nav-item active" data-demo-nav="assurance"><svg><use href="#i-shield"/></svg>Assurance</div>
+    <div class="nav-item" data-demo-nav="reports"><svg><use href="#i-doc"/></svg>Reports</div>
+    <div class="nav-item" data-demo-nav="alerts"><svg><use href="#i-bell"/></svg>Alerts</div>
+  </nav>
+  <div class="divider"></div>
+  <div class="rail-foot">
+    <div class="user-card">
+      <div class="avatar">JD</div>
+      <div class="user-meta">
+        <div class="name">Jane Doe</div>
+        <div class="role">Lead Assurance</div>
+      </div>
+    </div>
+    <button class="logout-btn" type="button" data-demo-nav="logout">
+      <svg><use href="#i-logout"/></svg>
+      Log out
+    </button>
+  </div>
+</aside>
+
+<header class="topbar">
+  <div class="crumbs">Map <span class="sep">/</span> Thames Valley &amp; HC <span class="sep">/</span> Oxford STW <span class="sep">/</span> <b>Assurance</b></div>
+  <div class="top-actions">
+    <span class="btn-ghost">Export register</span>
+    <span class="btn-ghost cyan">Escalate site</span>
+  </div>
+</header>
+
+<div class="main">
+  <div class="hero-card card">
+    <div class="score-ring"><span>28</span></div>
+    <div class="hero-body">
+      <div class="hero-kicker">Assurance hub · Site register · stress case</div>
+      <h1>
+        Oxford STW — assurance
+        <span class="pill red">28/100 Critical</span>
+        <span class="pill red">RAG RED</span>
+      </h1>
+      <div class="hero-meta">Elevated open items · parallel to Beckton hub · <b>CMDP JV</b> · <b>Demo only — not official TW</b></div>
+    </div>
+    <div class="kpi-chips">
+      <div class="kpi-chip"><div class="k">Open NCRs</div><div class="v r">22</div></div>
+      <div class="kpi-chip"><div class="k">Overdue</div><div class="v r">9</div></div>
+      <div class="kpi-chip"><div class="k">Holds</div><div class="v r">3</div></div>
+      <div class="kpi-chip"><div class="k">Last visit</div><div class="v c">12 Sep</div></div>
+    </div>
+  </div>
+
+  <div class="panel decisions card">
+    <div class="sec-label"><span>Open decisions</span><span class="link">VIEW QUEUE →</span></div>
+    <div class="row crit">
+      <span class="badge over">Overdue</span>
+      <div><div class="title">NCR-05521 · Clarifier integrity</div><div class="sub">Decision required · <b>9 days overdue</b></div></div>
+      <div class="meta"><b class="r">9d overdue</b>Owner · N. Okonkwo</div>
+      <span class="affordance">Open →</span>
+    </div>
+    <div class="row crit">
+      <span class="badge over">Overdue</span>
+      <div><div class="title">NCR-05488 · Process interface</div><div class="sub">Package interface · 6 days overdue</div></div>
+      <div class="meta"><b class="r">6d overdue</b>Owner · CMDP</div>
+      <span class="affordance">Open →</span>
+    </div>
+    <div class="row crit">
+      <span class="badge crit-hold">Crit hold</span>
+      <div><div class="title">HOLD-0194 · MEICA interface</div><div class="sub">Blocks secondary MEICA start</div></div>
+      <div class="meta"><b class="r">Critical</b>Since 22 Apr</div>
+      <span class="affordance">Open →</span>
+    </div>
+  </div>
+
+  <div class="panel ncrs card">
+    <div class="sec-label"><span>NCRs · elevated</span><span class="link">REGISTER →</span></div>
+    <div class="row clickable">
+      <span class="badge over">NCR</span>
+      <div><div class="title">NCR-05521 · Clarifier integrity</div><div class="sub">Primary settlement · <b>escalated</b></div></div>
+      <div class="meta"><b class="r">OVERDUE</b>Raised 16 Sep</div>
+      <span class="affordance">Open →</span>
+    </div>
+    <div class="row clickable">
+      <span class="badge over">NCR</span>
+      <div><div class="title">NCR-05488 · Process interface</div><div class="sub">Secondary / primary interface</div></div>
+      <div class="meta"><b class="r">OVERDUE</b>Raised 19 Sep</div>
+      <span class="affordance">Open →</span>
+    </div>
+    <div class="row">
+      <span class="badge over">NCR</span>
+      <div><div class="title">NCR-05461 · Edge protection PST-2</div><div class="sub">Structural · temporary edge incomplete</div></div>
+      <div class="meta"><b class="r">5d</b>Due 20 Sep</div>
+      <span class="affordance">Open →</span>
+    </div>
+    <div class="row">
+      <span class="badge open">NCR</span>
+      <div><div class="title">+19 further open NCRs</div><div class="sub">Register total open · <b>22</b> (demo)</div></div>
+      <div class="meta"><b>Open</b>View all</div>
+      <span class="affordance">List →</span>
+    </div>
+  </div>
+
+  <div class="panel holds card">
+    <div class="sec-label"><span>Holds</span><span class="link">ALL HOLDS →</span></div>
+    <div class="row crit">
+      <span class="badge crit-hold">HOLD</span>
+      <div><div class="title">HOLD-0194 · MEICA interface</div><div class="sub">Critical · secondary MEICA blocked</div></div>
+      <div class="meta"><b class="r">Critical</b>Since 22 Apr</div>
+      <span class="affordance">Open →</span>
+    </div>
+    <div class="row">
+      <span class="badge hold">HOLD</span>
+      <div><div class="title">HOLD-0188 · Ground investigation</div><div class="sub">Secondary dig · GI clarification</div></div>
+      <div class="meta"><b>Active</b>Since Aug</div>
+      <span class="affordance">Open →</span>
+    </div>
+    <div class="row">
+      <span class="badge hold">HOLD</span>
+      <div><div class="title">HOLD-0175 · Design freeze secondary</div><div class="sub">Awaiting TW design authority</div></div>
+      <div class="meta"><b>Active</b>Since Jul</div>
+      <span class="affordance">Open →</span>
+    </div>
+  </div>
+
+  <div class="panel hso card">
+    <div class="sec-label"><span>H&amp;S / compliance</span><span class="link">ALL →</span></div>
+    <div class="row">
+      <span class="badge over">HSO</span>
+      <div><div class="title">HSO-00204 · Excavation permit</div><div class="sub">4 days overdue · deep dig area</div></div>
+      <div class="meta"><b class="r">Overdue</b>Raised 21 Sep</div>
+      <span class="affordance">Open →</span>
+    </div>
+    <div class="row">
+      <span class="badge comp">RAMS</span>
+      <div><div class="title">Deep excavation RAMS under review</div><div class="sub">CMDP · TW review pending</div></div>
+      <div class="meta"><b>Amber</b>Compliance</div>
+      <span class="affordance">Open →</span>
+    </div>
+    <div class="row">
+      <span class="badge comp">Ind</span>
+      <div><div class="title">Inductions pending ×12 operatives</div><div class="sub">CMDP JV labour · site access hold risk</div></div>
+      <div class="meta"><b>Amber</b>Pending</div>
+      <span class="affordance">Open →</span>
+    </div>
+  </div>
+
+  <div class="panel activity card">
+    <div class="sec-label"><span>Recent assurance activity</span><span class="link">FULL LOG →</span></div>
+    <div class="act-row">
+      <div class="when">25 Sep 08:22</div>
+      <div class="what">Camera ALERT · <b>CAM-OXF-02</b> Primary Settlement linked to clarifier NCR thread</div>
+      <div class="who">System · Alerts</div>
+    </div>
+    <div class="act-row">
+      <div class="when">24 Sep 17:10</div>
+      <div class="what">Programme · PST-2 structural <b>−21 days</b> flagged against edge-protection NCR</div>
+      <div class="who">Helen Briggs · TW PM</div>
+    </div>
+    <div class="act-row">
+      <div class="when">21 Sep 10:15</div>
+      <div class="what">Compliance · deep excavation RAMS submitted · Inductions pending ×12</div>
+      <div class="who">Nina Okonkwo · CMDP</div>
+    </div>
+    <div class="act-row">
+      <div class="when">16 Sep 11:00</div>
+      <div class="what"><b>NCR-05521</b> raised · Clarifier integrity · now 9d overdue</div>
+      <div class="who">Tom Reeves · Ops</div>
+    </div>
+    <div class="act-row">
+      <div class="when">12 Sep 09:30</div>
+      <div class="what">Assurance visit · score <b>28/100 Critical</b> · escalate path confirmed</div>
+      <div class="who">Jane Doe · Lead Assurance</div>
+    </div>
+    <div class="demo-foot">Demo assurance register · not official TW scores · stress narrative mirrors Oxford GT RED</div>
+  </div>
+</div>
+<script src="../nav.js"></script>
+</body></html>
