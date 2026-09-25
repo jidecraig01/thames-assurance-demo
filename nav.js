@@ -723,23 +723,32 @@
   }
 
   function ensureAllSitesNav() {
-    // Site rails: inject "All sites" under Map so Portfolio is reachable from GT boards
+    // Always keep Portfolio as the first item under Navigate (back to 6-site home).
     if (file.indexOf('01-login') === 0) return;
     if (file.indexOf('00-sites-portfolio') === 0) return;
-    if (document.querySelector('[data-demo-nav="portfolio"]')) return;
     var nav = document.querySelector('.rail .nav');
     if (!nav) return;
-    var mapItem = nav.querySelector('[data-demo-nav="map"]');
-    var item = document.createElement('div');
-    item.className = 'nav-item';
-    item.setAttribute('data-demo-nav', 'portfolio');
-    item.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="7" height="7" rx="1"/><rect x="14" y="4" width="7" height="7" rx="1"/><rect x="3" y="13" width="7" height="7" rx="1"/><rect x="14" y="13" width="7" height="7" rx="1"/></svg>All sites';
-    if (mapItem && mapItem.parentNode === nav) {
-      if (mapItem.nextSibling) nav.insertBefore(item, mapItem.nextSibling);
-      else nav.appendChild(item);
-    } else {
-      nav.insertBefore(item, nav.firstChild);
+    var existing = nav.querySelector('[data-demo-nav="portfolio"]');
+    var item = existing;
+    if (!item) {
+      item = document.createElement('div');
+      item.className = 'nav-item';
+      item.setAttribute('data-demo-nav', 'portfolio');
+      item.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="7" height="7" rx="1"/><rect x="14" y="4" width="7" height="7" rx="1"/><rect x="3" y="13" width="7" height="7" rx="1"/><rect x="14" y="13" width="7" height="7" rx="1"/></svg>Portfolio';
     }
+    var label = null;
+    var kids = nav.children;
+    for (var i = 0; i < kids.length; i++) {
+      if (/Navigate/i.test((kids[i].textContent || '').trim()) && kids[i].classList.contains('nav-label')) {
+        label = kids[i];
+        break;
+      }
+    }
+    var firstAfter = label ? label.nextElementSibling : nav.firstChild;
+    if (item.parentNode === nav && firstAfter === item) return;
+    if (item.parentNode) item.parentNode.removeChild(item);
+    if (label && label.nextSibling) nav.insertBefore(item, label.nextSibling);
+    else nav.insertBefore(item, nav.firstChild);
   }
 
   function ensurePortfolioCrumb() {
