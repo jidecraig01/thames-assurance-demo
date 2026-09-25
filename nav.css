@@ -58,3 +58,29 @@ html.live-demo-shell body {
   margin: 0 auto;
   box-shadow: 0 0 0 1px rgba(255,255,255,0.04), 0 24px 80px rgba(0,0,0,0.55);
 }
+
+.pin-wrap.demo-linked,
+.demo-site-pin,
+[data-demo-nav="open-site"].demo-linked,
+[data-demo-nav="portfolio"].demo-linked,
+.cell.site-head.col-live.demo-linked,
+.col-live.demo-linked {
+  cursor: pointer !important;
+}
+.panel .srow,
+.panel .viewall,
+.panel .slist {
+  pointer-events: auto !important;
+}
+.srow.demo-linked:hover,
+.viewall.demo-linked:hover {
+  outline: 2px solid rgba(0,156,222,0.45);
+  outline-offset: 1px;
+}
+.cell.site-head.col-live.demo-linked:hover {
+  filter: brightness(1.08);
+}
+.demo-muted {
+  cursor: default;
+}
+#demo-toast.show { opacity: 1 !important; }

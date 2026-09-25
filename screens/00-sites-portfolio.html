@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --tw-blue: #009CDE;
+  --tw-cyan: #00A3E0;
+  --navy: #0A2540;
+  --navy-mid: #12355C;
+  --rag-g: #22C55E;
+  --rag-a: #F59E0B;
+  --rag-r: #EF4444;
+  --rag-x: #B91C1C;
+  --rail-w: 248px;
+  --font: "Inter", "Segoe UI", system-ui, sans-serif;
+  --risk-low: #BAE6FD;
+  --risk-med: #FED7AA;
+  --risk-high: #FBCFE8;
+  --risk-ext: #FECACA;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { width: 1440px; height: 900px; overflow: hidden; font-family: var(--font); background: #050810; color: #E8F1F8; }
+
+.rail {
+  position: absolute; left: 0; top: 0; bottom: 0; width: var(--rail-w);
+  background: #FFFFFF; color: var(--navy);
+  display: flex; flex-direction: column; z-index: 30;
+  box-shadow: 4px 0 24px rgba(5,8,16,0.35);
+}
+.rail-brand { padding: 18px 18px 16px; display: flex; align-items: center; gap: 12px; }
+.logo-plate {
+  flex-shrink: 0; width: 52px; height: 52px; border-radius: 14px; background: #fff;
+  display: grid; place-items: center;
+  box-shadow: 0 1px 0 rgba(10,37,64,0.06), 0 0 0 1px rgba(10,37,64,0.08);
+}
+.logo-plate img { width: 44px; height: 44px; border-radius: 50%; display: block; }
+.brand-text .org { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; color: var(--navy); text-transform: uppercase; }
+.brand-text .app { font-size: 12.5px; font-weight: 600; color: #3A556E; margin-top: 2px; }
+.divider { height: 1px; margin: 0 16px; background: var(--navy); opacity: 0.18; }
+.nav { padding: 14px 12px 8px; display: flex; flex-direction: column; gap: 2px; flex: 1; }
+.nav-label { font-size: 10px; font-weight: 700; letter-spacing: 0.1em; color: #6A8299; text-transform: uppercase; padding: 6px 12px 8px; }
+.nav-item {
+  display: flex; align-items: center; gap: 11px;
+  padding: 10px 12px; border-radius: 10px;
+  font-size: 13.5px; font-weight: 500; color: #3A556E;
+}
+.nav-item svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
+.nav-item.active {
+  background: rgba(0,156,222,0.12); color: #0077A8; font-weight: 650;
+  box-shadow: inset 0 0 0 1px rgba(0,156,222,0.35);
+}
+.nav-item .badge-n {
+  margin-left: auto; font-size: 10px; font-weight: 700;
+  padding: 2px 7px; border-radius: 999px;
+  background: rgba(239,68,68,0.12); color: #B91C1C;
+}
+.nav-section-gap { height: 8px; }
+.rail-foot { padding: 12px 14px 16px; }
+.user-card {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 10px; border-radius: 12px;
+  background: #F4F8FB; border: 1px solid rgba(10,37,64,0.08);
+}
+.avatar {
+  width: 34px; height: 34px; border-radius: 50%;
+  background: linear-gradient(135deg, #009CDE, #005A8C);
+  color: #fff; font-size: 12px; font-weight: 700; display: grid; place-items: center;
+}
+.user-meta .name { font-size: 12.5px; font-weight: 650; color: var(--navy); }
+.user-meta .role { font-size: 11px; color: #6A8299; margin-top: 1px; }
+.logout-btn {
+  display:flex; align-items:center; justify-content:center; gap:7px;
+  width:100%; margin-top:8px; padding:7px 10px;
+  border-radius:9px; border:1px solid rgba(10,37,64,0.14);
+  background:#fff; color:#3A556E;
+  font-family:inherit; font-size:11px; font-weight:650; letter-spacing:0.04em;
+  cursor:pointer;
+}
+.logout-btn svg { width:14px; height:14px; stroke:currentColor; fill:none; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; flex-shrink:0; }
+.logout-btn:hover { background:#F4F8FB; color:var(--navy); border-color:rgba(10,37,64,0.22); }
+
+.topbar {
+  position: absolute; left: var(--rail-w); right: 0; top: 0; height: 64px;
+  display: flex; align-items: center; gap: 16px; padding: 0 22px;
+  background: linear-gradient(180deg, rgba(8,12,22,0.98), rgba(8,12,22,0.88));
+  border-bottom: 1px solid rgba(0,163,224,0.14); z-index: 20;
+}
+.hdr-logo {
+  width: 40px; height: 40px; border-radius: 10px; background: #fff;
+  display: grid; place-items: center; flex-shrink: 0;
+  box-shadow: 0 0 0 1px rgba(255,255,255,0.12), 0 4px 12px rgba(0,0,0,0.25);
+}
+.hdr-logo img { width: 34px; height: 34px; border-radius: 50%; display: block; }
+.brand-title { font-size: 16px; font-weight: 750; color: #F2F7FB; letter-spacing: 0.01em; }
+.brand-sub { font-size: 11px; color: #7DD3F0; font-weight: 600; letter-spacing: 0.1em; margin-top: 2px; }
+.rag-summary { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+.rag-chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 11px; border-radius: 999px; font-size: 12px; font-weight: 600;
+  background: rgba(15,22,41,0.85); border: 1px solid rgba(0,163,224,0.2); color: #D7E8F4;
+}
+.dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+.dot.g { background: var(--rag-g); box-shadow: 0 0 8px rgba(34,197,94,0.55); }
+.dot.a { background: var(--rag-a); box-shadow: 0 0 8px rgba(245,158,11,0.55); }
+.dot.r { background: var(--rag-r); box-shadow: 0 0 8px rgba(239,68,68,0.55); }
+
+.main {
+  position: absolute; left: var(--rail-w); top: 64px; right: 0; bottom: 0;
+  overflow: hidden; background: #0B1220;
+  padding: 16px 18px 14px;
+  display: flex; flex-direction: column;
+}
+.main-head {
+  display: flex; align-items: baseline; justify-content: space-between;
+  margin-bottom: 12px; flex-shrink: 0;
+}
+.main-head h1 { font-size: 18px; font-weight: 750; color: #F2F7FB; }
+.main-head .period { font-size: 12px; color: #7AA0B8; font-weight: 500; }
+.main-head .period b { color: #A8D4EA; font-weight: 650; }
+.note { font-size: 10.5px; color: #6A8299; margin-top: 3px; }
+
+.grid-wrap {
+  flex: 1; min-height: 0;
+  background: #fff; border-radius: 14px;
+  border: 1px solid rgba(10,37,64,0.1);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.35);
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: 132px repeat(6, 1fr);
+  grid-template-rows:
+    52px /* site */
+    28px /* region */
+    28px /* code */
+    28px /* type */
+    44px /* timeline */
+    72px /* progress */
+    52px /* resource */
+    52px /* budget */
+    28px /* risk hdr */
+    36px 36px 36px 36px; /* L M H E */
+}
+
+.lab {
+  background: var(--navy);
+  color: #F2F7FB;
+  font-size: 10.5px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+  display: flex; align-items: center; padding: 0 12px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  border-right: 1px solid rgba(255,255,255,0.06);
+}
+.lab.sub { background: var(--navy-mid); font-size: 10px; font-weight: 600; letter-spacing: 0.04em; text-transform: none; color: #C8DCE8; }
+.lab.risk-low { background: #0369A1; }
+.lab.risk-med { background: #C2410C; }
+.lab.risk-high { background: #9D174D; }
+.lab.risk-ext { background: #991B1B; }
+
+.cell {
+  border-bottom: 1px solid rgba(10,37,64,0.08);
+  border-right: 1px solid rgba(10,37,64,0.08);
+  display: flex; align-items: center; justify-content: center;
+  padding: 6px 8px; text-align: center;
+  font-size: 12px; color: var(--navy); background: #fff;
+  min-width: 0;
+}
+.cell.muted-bg { background: #F4F8FB; }
+.cell.site-head {
+  background: linear-gradient(180deg, #0E3A5C, #0A2540);
+  color: #F2F7FB; flex-direction: column; gap: 4px; padding: 8px 6px;
+  border-bottom: 1px solid rgba(0,163,224,0.25);
+}
+.cell.site-head .sname { font-size: 13.5px; font-weight: 750; letter-spacing: 0.02em; }
+.cell.site-head .sopen {
+  font-size: 10px; font-weight: 650; letter-spacing: 0.04em;
+  padding: 3px 8px; border-radius: 999px;
+  background: rgba(0,156,222,0.22); color: #7DD3FC;
+  border: 1px solid rgba(0,163,224,0.4);
+}
+.cell.site-head.col-live { cursor: pointer; }
+.cell.site-head.col-live:hover {
+  background: linear-gradient(180deg, #12507A, #0C3050);
+  box-shadow: inset 0 0 0 2px rgba(0,163,224,0.55);
+}
+.cell.site-head.col-demo .sopen {
+  background: rgba(255,255,255,0.08); color: rgba(200,220,235,0.55);
+  border-color: rgba(255,255,255,0.12);
+}
+.cell.col-demo { opacity: 0.92; }
+.cell.site-head.col-demo.demo-muted { cursor: default; }
+
+.cell .meta { font-size: 11.5px; font-weight: 600; color: var(--navy); }
+.cell .meta-sub { font-size: 10px; color: #6A8299; font-weight: 500; margin-top: 1px; }
+.cell.stack { flex-direction: column; gap: 1px; }
+
+.tl { display: flex; width: 100%; gap: 4px; }
+.tl > div { flex: 1; text-align: center; }
+.tl .k { font-size: 9px; font-weight: 700; letter-spacing: 0.06em; color: #6A8299; text-transform: uppercase; }
+.tl .v { font-size: 11px; font-weight: 650; color: var(--navy); margin-top: 2px; }
+
+.prog { display: flex; flex-direction: column; align-items: center; gap: 5px; width: 100%; }
+.prog .pct { font-size: 20px; font-weight: 800; line-height: 1; letter-spacing: -0.02em; }
+.prog .status { font-size: 9.5px; font-weight: 750; letter-spacing: 0.06em; }
+.prog .bar {
+  width: 100%; height: 8px; border-radius: 4px; background: rgba(10,37,64,0.08); overflow: hidden;
+}
+.prog .bar > i { display: block; height: 100%; border-radius: 4px; }
+.prog.on .pct, .prog.on .status { color: #B45309; }
+.prog.on .bar > i { background: linear-gradient(90deg, #D97706, #F59E0B); }
+.prog.behind .pct, .prog.behind .status { color: #B91C1C; }
+.prog.behind .bar > i { background: linear-gradient(90deg, #B91C1C, #EF4444); }
+.prog.good .pct, .prog.good .status { color: #15803D; }
+.prog.good .bar > i { background: linear-gradient(90deg, #16A34A, #4ADE80); }
+
+.pair { display: flex; width: 100%; gap: 0; }
+.pair > div { flex: 1; text-align: center; padding: 2px 4px; }
+.pair .k { font-size: 9px; font-weight: 700; letter-spacing: 0.05em; color: #6A8299; text-transform: uppercase; }
+.pair .v { font-size: 11.5px; font-weight: 700; color: var(--navy); margin-top: 2px; }
+.cell.res { background: #ECFDF5; }
+.cell.bud { background: #FFF7ED; }
+
+.risk-cell {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  font-size: 14px; font-weight: 800; color: var(--navy);
+}
+.risk-cell.low { background: var(--risk-low); }
+.risk-cell.med { background: var(--risk-med); }
+.risk-cell.high { background: var(--risk-high); }
+.risk-cell.ext { background: var(--risk-ext); }
+.trend {
+  width: 22px; height: 22px; border-radius: 50%;
+  display: grid; place-items: center;
+  background: rgba(255,255,255,0.75);
+  box-shadow: 0 0 0 1px rgba(10,37,64,0.1);
+}
+.trend svg { width: 12px; height: 12px; }
+.trend.up svg { stroke: #B91C1C; }
+.trend.down svg { stroke: #15803D; }
+.trend.flat svg { stroke: #0369A1; }
+.trend.up-r svg { stroke: #C2410C; }
+
+.toast {
+  position: absolute; left: 50%; bottom: 22px; transform: translateX(-50%) translateY(12px);
+  background: rgba(10,37,64,0.94); color: #E8F4FA;
+  font-size: 12.5px; font-weight: 600; padding: 10px 18px; border-radius: 10px;
+  border: 1px solid rgba(0,163,224,0.35);
+  box-shadow: 0 10px 28px rgba(0,0,0,0.4);
+  opacity: 0; pointer-events: none; transition: opacity 0.2s, transform 0.2s; z-index: 50;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+</style>
+<link rel="stylesheet" href="../nav.css"/>
+</head><body data-demo-site="shared">
+
+<svg style="display:none">
+  <symbol id="i-portfolio" viewBox="0 0 24 24"><rect x="3" y="4" width="7" height="7" rx="1"/><rect x="14" y="4" width="7" height="7" rx="1"/><rect x="3" y="13" width="7" height="7" rx="1"/><rect x="14" y="13" width="7" height="7" rx="1"/></symbol>
+  <symbol id="i-map" viewBox="0 0 24 24"><path d="M9 3l6 2 6-2v16l-6 2-6-2-6 2V5l6-2z"/><path d="M9 3v16M15 5v16"/></symbol>
+  <symbol id="i-regions" viewBox="0 0 24 24"><path d="M4 6l8-3 8 3v12l-8 3-8-3V6z"/><path d="M12 3v18M4 12h16"/></symbol>
+  <symbol id="i-sites" viewBox="0 0 24 24"><path d="M12 21s-7-5.2-7-11a7 7 0 0114 0c0 5.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></symbol>
+  <symbol id="i-prog" viewBox="0 0 24 24"><path d="M4 19V5M4 19h16"/><path d="M8 15V9M12 15V7M16 15v-3"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6l8-3z"/></symbol>
+  <symbol id="i-doc" viewBox="0 0 24 24"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></symbol>
+  <symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 9a6 6 0 0112 0c0 7 2 7 2 9H4c0-2 2-2 2-9"/><path d="M10 20a2 2 0 004 0"/></symbol>
+  <symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M2 12h3M19 12h3M4.9 19.1L7 17M17 7l2.1-2.1"/></symbol>
+  <symbol id="i-logout" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></symbol>
+  <symbol id="t-up" viewBox="0 0 24 24"><path d="M12 19V5M5 12l7-7 7 7" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="t-down" viewBox="0 0 24 24"><path d="M12 5v14M5 12l7 7 7-7" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="t-flat" viewBox="0 0 24 24"><path d="M5 12h14M15 8l4 4-4 4" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="t-upr" viewBox="0 0 24 24"><path d="M7 17L17 7M9 7h8v8" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+</svg>
+
+<aside class="rail">
+  <div class="rail-brand">
+    <div class="logo-plate"><img src="tw-logo-128.png" alt="Thames Water"/></div>
+    <div class="brand-text">
+      <div class="org">Thames Water</div>
+      <div class="app">Thames Assurance</div>
+    </div>
+  </div>
+  <div class="divider"></div>
+  <nav class="nav">
+    <div class="nav-label">Navigate</div>
+    <div class="nav-item active" data-demo-nav="portfolio"><svg><use href="#i-portfolio"/></svg>Portfolio</div>
+    <div class="nav-item" data-demo-nav="map"><svg><use href="#i-map"/></svg>Map</div>
+    <div class="nav-item" data-demo-nav="regions"><svg><use href="#i-regions"/></svg>Regions</div>
+    <div class="nav-section-gap"></div>
+    <div class="divider" style="margin:4px 4px 10px"></div>
+    <div class="nav-label">Programme</div>
+    <div class="nav-item" data-demo-nav="programme"><svg><use href="#i-prog"/></svg>Programme</div>
+    <div class="nav-item" data-demo-nav="assurance"><svg><use href="#i-shield"/></svg>Assurance</div>
+    <div class="nav-item" data-demo-nav="reports"><svg><use href="#i-doc"/></svg>Reports</div>
+    <div class="nav-item" data-demo-nav="alerts"><svg><use href="#i-bell"/></svg>Alerts <span class="badge-n">3</span></div>
+    <div class="nav-section-gap"></div>
+    <div class="divider" style="margin:4px 4px 10px"></div>
+    <div class="nav-item" data-demo-nav="settings"><svg><use href="#i-gear"/></svg>Settings</div>
+  </nav>
+  <div class="divider"></div>
+  <div class="rail-foot">
+    <div class="user-card">
+      <div class="avatar">JD</div>
+      <div class="user-meta">
+        <div class="name">Jane Doe</div>
+        <div class="role">Lead Assurance</div>
+      </div>
+    </div>
+    <button class="logout-btn" type="button" data-demo-nav="logout">
+      <svg><use href="#i-logout"/></svg>
+      Log out
+    </button>
+  </div>
+</aside>
+
+<header class="topbar">
+  <div class="hdr-logo"><img src="tw-logo-128.png" alt="Thames Water"/></div>
+  <div>
+    <div class="brand-title">Thames Assurance</div>
+    <div class="brand-sub">SITES PORTFOLIO · Q3 2026</div>
+  </div>
+  <div class="rag-summary">
+    <span class="rag-chip"><span class="dot g"></span>2 on track+</span>
+    <span class="rag-chip"><span class="dot a"></span>3 amber</span>
+    <span class="rag-chip"><span class="dot r"></span>1 red</span>
+  </div>
+</header>
+
+<div class="main">
+  <div class="main-head">
+    <div>
+      <h1>Sites portfolio overview</h1>
+      <div class="note">Demo placeholder data — not official Thames Water scores</div>
+    </div>
+    <div class="period">Reporting window · <b>Jul 2026 – Sep 2026</b></div>
+  </div>
+
+  <div class="grid-wrap" id="portfolio-grid">
+    <!-- Label column -->
+    <div class="lab">Site</div>
+    <div class="cell site-head col-head" data-col="beckton"><div class="sname">Beckton</div><div class="sopen" data-demo-nav="open-site" data-demo-site="beckton">Open site →</div></div>
+    <div class="cell site-head col-head" data-col="oxford"><div class="sname">Oxford</div><div class="sopen" data-demo-nav="open-site" data-demo-site="oxford">Open site →</div></div>
+    <div class="cell site-head col-head" data-col="crossness"><div class="sname">Crossness</div><div class="sopen demo-muted" data-demo-nav="demo-only" data-demo-site="crossness">Overview only</div></div>
+    <div class="cell site-head col-head" data-col="mogden"><div class="sname">Mogden</div><div class="sopen demo-muted" data-demo-nav="demo-only" data-demo-site="mogden">Overview only</div></div>
+    <div class="cell site-head col-head" data-col="hogsmill"><div class="sname">Hogsmill</div><div class="sopen demo-muted" data-demo-nav="demo-only" data-demo-site="hogsmill">Overview only</div></div>
+    <div class="cell site-head col-head" data-col="deephams"><div class="sname">Deephams</div><div class="sopen demo-muted" data-demo-nav="demo-only" data-demo-site="deephams">Overview only</div></div>
+
+    <div class="lab sub">Region</div>
+    <div class="cell muted-bg" data-col="beckton"><span class="meta">London</span></div>
+    <div class="cell muted-bg" data-col="oxford"><span class="meta">TV &amp; HC</span></div>
+    <div class="cell muted-bg" data-col="crossness"><span class="meta">London</span></div>
+    <div class="cell muted-bg" data-col="mogden"><span class="meta">London</span></div>
+    <div class="cell muted-bg" data-col="hogsmill"><span class="meta">London</span></div>
+    <div class="cell muted-bg" data-col="deephams"><span class="meta">London</span></div>
+
+    <div class="lab sub">Code</div>
+    <div class="cell" data-col="beckton"><span class="meta">TW-BKT-AMP8</span></div>
+    <div class="cell" data-col="oxford"><span class="meta">TW-OXF-AMP8</span></div>
+    <div class="cell" data-col="crossness"><span class="meta">TW-CRX-AMP8</span></div>
+    <div class="cell" data-col="mogden"><span class="meta">TW-MOG-AMP8</span></div>
+    <div class="cell" data-col="hogsmill"><span class="meta">TW-HOG-AMP8</span></div>
+    <div class="cell" data-col="deephams"><span class="meta">TW-DPH-AMP8</span></div>
+
+    <div class="lab sub">Type</div>
+    <div class="cell muted-bg stack" data-col="beckton"><span class="meta">STW Upgrade</span><span class="meta-sub">Civils · MEICA</span></div>
+    <div class="cell muted-bg stack" data-col="oxford"><span class="meta">STW Upgrade</span><span class="meta-sub">Capacity · Quality</span></div>
+    <div class="cell muted-bg stack" data-col="crossness"><span class="meta">STW Upgrade</span><span class="meta-sub">Capacity</span></div>
+    <div class="cell muted-bg stack" data-col="mogden"><span class="meta">STW Upgrade</span><span class="meta-sub">Sludge hub</span></div>
+    <div class="cell muted-bg stack" data-col="hogsmill"><span class="meta">Storm tanks</span><span class="meta-sub">AMP8 major</span></div>
+    <div class="cell muted-bg stack" data-col="deephams"><span class="meta">Capacity</span><span class="meta-sub">Lea catchment</span></div>
+
+    <div class="lab">Timeline</div>
+    <div class="cell" data-col="beckton"><div class="tl"><div><div class="k">Start</div><div class="v">03 Mar 2024</div></div><div><div class="k">End</div><div class="v">30 Sep 2027</div></div></div></div>
+    <div class="cell" data-col="oxford"><div class="tl"><div><div class="k">Start</div><div class="v">12 Jun 2023</div></div><div><div class="k">End</div><div class="v">31 Dec 2030</div></div></div></div>
+    <div class="cell" data-col="crossness"><div class="tl"><div><div class="k">Start</div><div class="v">15 Jan 2025</div></div><div><div class="k">End</div><div class="v">31 Mar 2028</div></div></div></div>
+    <div class="cell" data-col="mogden"><div class="tl"><div><div class="k">Start</div><div class="v">01 Apr 2024</div></div><div><div class="k">End</div><div class="v">30 Jun 2027</div></div></div></div>
+    <div class="cell" data-col="hogsmill"><div class="tl"><div><div class="k">Start</div><div class="v">01 Sep 2025</div></div><div><div class="k">End</div><div class="v">31 Dec 2028</div></div></div></div>
+    <div class="cell" data-col="deephams"><div class="tl"><div><div class="k">Start</div><div class="v">01 Feb 2025</div></div><div><div class="k">End</div><div class="v">30 Sep 2029</div></div></div></div>
+
+    <div class="lab">Progress</div>
+    <div class="cell" data-col="beckton"><div class="prog on"><div class="pct">61%</div><div class="status">ON TRACK</div><div class="bar"><i style="width:61%"></i></div></div></div>
+    <div class="cell" data-col="oxford"><div class="prog behind"><div class="pct">34%</div><div class="status">BEHIND</div><div class="bar"><i style="width:34%"></i></div></div></div>
+    <div class="cell" data-col="crossness"><div class="prog on"><div class="pct">48%</div><div class="status">ON TRACK</div><div class="bar"><i style="width:48%"></i></div></div></div>
+    <div class="cell" data-col="mogden"><div class="prog good"><div class="pct">72%</div><div class="status">AHEAD</div><div class="bar"><i style="width:72%"></i></div></div></div>
+    <div class="cell" data-col="hogsmill"><div class="prog on"><div class="pct">29%</div><div class="status">ON TRACK</div><div class="bar"><i style="width:29%"></i></div></div></div>
+    <div class="cell" data-col="deephams"><div class="prog on"><div class="pct">41%</div><div class="status">WATCH</div><div class="bar"><i style="width:41%"></i></div></div></div>
+
+    <div class="lab">Resource</div>
+    <div class="cell res" data-col="beckton"><div class="pair"><div><div class="k">Planned</div><div class="v">12,400 h</div></div><div><div class="k">Actual</div><div class="v">11,820 h</div></div></div></div>
+    <div class="cell res" data-col="oxford"><div class="pair"><div><div class="k">Planned</div><div class="v">18,600 h</div></div><div><div class="k">Actual</div><div class="v">21,140 h</div></div></div></div>
+    <div class="cell res" data-col="crossness"><div class="pair"><div><div class="k">Planned</div><div class="v">9,800 h</div></div><div><div class="k">Actual</div><div class="v">9,450 h</div></div></div></div>
+    <div class="cell res" data-col="mogden"><div class="pair"><div><div class="k">Planned</div><div class="v">8,200 h</div></div><div><div class="k">Actual</div><div class="v">7,960 h</div></div></div></div>
+    <div class="cell res" data-col="hogsmill"><div class="pair"><div><div class="k">Planned</div><div class="v">4,100 h</div></div><div><div class="k">Actual</div><div class="v">3,880 h</div></div></div></div>
+    <div class="cell res" data-col="deephams"><div class="pair"><div><div class="k">Planned</div><div class="v">6,750 h</div></div><div><div class="k">Actual</div><div class="v">7,020 h</div></div></div></div>
+
+    <div class="lab">Budget</div>
+    <div class="cell bud" data-col="beckton"><div class="pair"><div><div class="k">Planned</div><div class="v">£185.0m</div></div><div><div class="k">Actual</div><div class="v">£178.4m</div></div></div></div>
+    <div class="cell bud" data-col="oxford"><div class="pair"><div><div class="k">Planned</div><div class="v">£272.0m</div></div><div><div class="k">Actual</div><div class="v">£291.5m</div></div></div></div>
+    <div class="cell bud" data-col="crossness"><div class="pair"><div><div class="k">Planned</div><div class="v">£142.0m</div></div><div><div class="k">Actual</div><div class="v">£139.2m</div></div></div></div>
+    <div class="cell bud" data-col="mogden"><div class="pair"><div><div class="k">Planned</div><div class="v">£98.5m</div></div><div><div class="k">Actual</div><div class="v">£94.1m</div></div></div></div>
+    <div class="cell bud" data-col="hogsmill"><div class="pair"><div><div class="k">Planned</div><div class="v">£54.0m</div></div><div><div class="k">Actual</div><div class="v">£51.8m</div></div></div></div>
+    <div class="cell bud" data-col="deephams"><div class="pair"><div><div class="k">Planned</div><div class="v">£76.0m</div></div><div><div class="k">Actual</div><div class="v">£79.4m</div></div></div></div>
+
+    <div class="lab">Risk Radar</div>
+    <div class="cell muted-bg" data-col="beckton" style="font-size:10.5px;font-weight:650;color:#3A556E">Sep 2026</div>
+    <div class="cell muted-bg" data-col="oxford" style="font-size:10.5px;font-weight:650;color:#3A556E">Sep 2026</div>
+    <div class="cell muted-bg" data-col="crossness" style="font-size:10.5px;font-weight:650;color:#3A556E">Sep 2026</div>
+    <div class="cell muted-bg" data-col="mogden" style="font-size:10.5px;font-weight:650;color:#3A556E">Sep 2026</div>
+    <div class="cell muted-bg" data-col="hogsmill" style="font-size:10.5px;font-weight:650;color:#3A556E">Sep 2026</div>
+    <div class="cell muted-bg" data-col="deephams" style="font-size:10.5px;font-weight:650;color:#3A556E">Sep 2026</div>
+
+    <div class="lab risk-low">Low</div>
+    <div class="cell risk-cell low" data-col="beckton">4<span class="trend down"><svg><use href="#t-down"/></svg></span></div>
+    <div class="cell risk-cell low" data-col="oxford">2<span class="trend up"><svg><use href="#t-up"/></svg></span></div>
+    <div class="cell risk-cell low" data-col="crossness">5<span class="trend flat"><svg><use href="#t-flat"/></svg></span></div>
+    <div class="cell risk-cell low" data-col="mogden">6<span class="trend down"><svg><use href="#t-down"/></svg></span></div>
+    <div class="cell risk-cell low" data-col="hogsmill">3<span class="trend flat"><svg><use href="#t-flat"/></svg></span></div>
+    <div class="cell risk-cell low" data-col="deephams">4<span class="trend down"><svg><use href="#t-down"/></svg></span></div>
+
+    <div class="lab risk-med">Medium</div>
+    <div class="cell risk-cell med" data-col="beckton">2<span class="trend flat"><svg><use href="#t-flat"/></svg></span></div>
+    <div class="cell risk-cell med" data-col="oxford">5<span class="trend up-r"><svg><use href="#t-upr"/></svg></span></div>
+    <div class="cell risk-cell med" data-col="crossness">3<span class="trend down"><svg><use href="#t-down"/></svg></span></div>
+    <div class="cell risk-cell med" data-col="mogden">2<span class="trend flat"><svg><use href="#t-flat"/></svg></span></div>
+    <div class="cell risk-cell med" data-col="hogsmill">2<span class="trend up"><svg><use href="#t-up"/></svg></span></div>
+    <div class="cell risk-cell med" data-col="deephams">3<span class="trend up-r"><svg><use href="#t-upr"/></svg></span></div>
+
+    <div class="lab risk-high">High</div>
+    <div class="cell risk-cell high" data-col="beckton">1<span class="trend down"><svg><use href="#t-down"/></svg></span></div>
+    <div class="cell risk-cell high" data-col="oxford">3<span class="trend up"><svg><use href="#t-up"/></svg></span></div>
+    <div class="cell risk-cell high" data-col="crossness">1<span class="trend flat"><svg><use href="#t-flat"/></svg></span></div>
+    <div class="cell risk-cell high" data-col="mogden">0<span class="trend flat"><svg><use href="#t-flat"/></svg></span></div>
+    <div class="cell risk-cell high" data-col="hogsmill">1<span class="trend flat"><svg><use href="#t-flat"/></svg></span></div>
+    <div class="cell risk-cell high" data-col="deephams">1<span class="trend up"><svg><use href="#t-up"/></svg></span></div>
+
+    <div class="lab risk-ext">Extreme</div>
+    <div class="cell risk-cell ext" data-col="beckton">0<span class="trend flat"><svg><use href="#t-flat"/></svg></span></div>
+    <div class="cell risk-cell ext" data-col="oxford">1<span class="trend up"><svg><use href="#t-up"/></svg></span></div>
+    <div class="cell risk-cell ext" data-col="crossness">0<span class="trend flat"><svg><use href="#t-flat"/></svg></span></div>
+    <div class="cell risk-cell ext" data-col="mogden">0<span class="trend flat"><svg><use href="#t-flat"/></svg></span></div>
+    <div class="cell risk-cell ext" data-col="hogsmill">0<span class="trend flat"><svg><use href="#t-flat"/></svg></span></div>
+    <div class="cell risk-cell ext" data-col="deephams">0<span class="trend flat"><svg><use href="#t-flat"/></svg></span></div>
+  </div>
+</div>
+
+<div class="toast" id="demo-toast">Demo overview only — full GT board not wired for this site</div>
+
+<script>
+(function () {
+  // Mark live vs demo columns for styling / nav hooks
+  var live = { beckton: 1, oxford: 1 };
+  document.querySelectorAll('[data-col]').forEach(function (el) {
+    var c = el.getAttribute('data-col');
+    if (!c) return;
+    if (live[c]) el.classList.add('col-live');
+    else { el.classList.add('col-demo', 'demo-muted'); }
+  });
+  // Column click targets: site-head cells for Beckton / Oxford
+  document.querySelectorAll('.cell.site-head.col-live').forEach(function (el) {
+    var site = el.getAttribute('data-col');
+    el.setAttribute('data-demo-site', site);
+    el.setAttribute('data-demo-nav', 'open-site');
+  });
+})();
+</script>
+<script src="../nav.js"></script>
+</body></html>

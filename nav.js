@@ -10,6 +10,7 @@
 
   var ROUTES = {
     login: '01-login-dark.html',
+    portfolio: '00-sites-portfolio.html',
     map: '02-map-home.html',
     london: '03-region-sites.html',
     tv: '06-region-thames-valley.html',
@@ -86,6 +87,7 @@
     if (key) return key;
     var t = textOf(el);
     if (/Site Dashboard/i.test(t)) return 'dashboard';
+    if (/^Portfolio$/i.test(t) || /^All sites$/i.test(t)) return 'portfolio';
     if (/Overview\s*\/\s*Map/i.test(t) || /^Map$/i.test(t)) return 'map';
     if (/^Regions$/i.test(t)) return 'regions';
     if (/Site locations/i.test(t)) return 'sites';
@@ -122,6 +124,11 @@
       return true;
     }
 
+    if (key === 'portfolio') {
+      go(ROUTES.portfolio);
+      return true;
+    }
+
     if (s === 'shared') {
       if (key === 'map') { go(ROUTES.map); return true; }
       if (key === 'regions') {
@@ -134,7 +141,7 @@
         else go(ROUTES.london);
         return true;
       }
-      // Map-level Programme / Assurance / Reports / Alerts → Beckton demo samples
+      // Shared-level Programme / Assurance / Reports / Alerts → Beckton demo samples
       if (key === 'programme') { go(ROUTES.programmeB); return true; }
       if (key === 'assurance') { go(ROUTES.assuranceB); return true; }
       if (key === 'reports') { go(ROUTES.reportsB); return true; }
@@ -208,6 +215,7 @@
       var target = e.target;
       var raw = textOf(target).replace(/\s*\/\s*/g, '').trim();
 
+      if (/^Portfolio$/i.test(raw) || /^All sites$/i.test(raw)) { go(ROUTES.portfolio); return; }
       if (/^Map( Home)?$/i.test(raw)) { go(ROUTES.map); return; }
       if (/Map/i.test(raw) && !/Beckton|Oxford|London|Thames|NCR|Reports|Assurance|Programme|Alerts|visuals|CAM/i.test(raw)) {
         go(ROUTES.map); return;
@@ -240,7 +248,10 @@
       }
       crumbs.querySelectorAll('span, b').forEach(function (el) {
         var t = textOf(el);
-        if (/^London$/i.test(t)) {
+        if (/^Portfolio$/i.test(t) || /^All sites$/i.test(t)) {
+          mark(el); el.style.cursor = 'pointer'; el.style.color = el.style.color || '#7DD3FC';
+          onClick(el, function () { go(ROUTES.portfolio); });
+        } else if (/^London$/i.test(t)) {
           mark(el); el.style.cursor = 'pointer'; el.style.color = el.style.color || '#7DD3FC';
           onClick(el, function () { go(ROUTES.london); });
         } else if (/Thames Valley/i.test(t)) {
@@ -270,11 +281,11 @@
   function wireLogin() {
     if (file.indexOf('01-login') !== 0) return;
     var btn = document.querySelector('.btn');
-    onClick(btn, function () { go(ROUTES.map); });
+    onClick(btn, function () { go(ROUTES.portfolio); });
     var sso = document.querySelector('.sso');
-    onClick(sso, function () { go(ROUTES.map); });
+    onClick(sso, function () { go(ROUTES.portfolio); });
     document.addEventListener('keydown', function (e) {
-      if (e.key === 'Enter') go(ROUTES.map);
+      if (e.key === 'Enter') go(ROUTES.portfolio);
     });
   }
 
@@ -333,49 +344,141 @@
             });
           });
         }
-        // Pin labels: make Beckton / Oxford pin wraps clickable
-        mapEl.querySelectorAll('.pin-wrap').forEach(function (wrap) {
-          var label = textOf(wrap.querySelector('.pin-label')) || textOf(wrap);
-          if (/Beckton/i.test(label)) {
-            wrap.style.cursor = 'pointer';
-            wrap.style.pointerEvents = 'auto';
-            onClick(wrap, function () { go(ROUTES.becktonGt); });
-          } else if (/Oxford/i.test(label)) {
-            wrap.style.cursor = 'pointer';
-            wrap.style.pointerEvents = 'auto';
-            onClick(wrap, function () { go(ROUTES.oxfordGt); });
+        // Pin labels + data-demo-site hooks: Beckton / Oxford equally clickable
+        function wirePin(wrap, href) {
+          if (!wrap || wrap.__demoWired) return;
+          var icon = wrap.closest('.leaflet-marker-icon, .leaflet-div-icon');
+          if (icon) {
+            icon.style.pointerEvents = 'auto';
+            icon.style.cursor = 'pointer';
+            icon.style.zIndex = '650';
           }
+          wrap.style.cursor = 'pointer';
+          wrap.style.pointerEvents = 'auto';
+          // Expand hit area around the pin
+          wrap.style.width = '88px';
+          wrap.style.height = '28px';
+          wrap.style.left = '-10px';
+          wrap.style.top = '-14px';
+          onClick(wrap, function () { go(href); });
+          if (icon && !icon.__demoWired) {
+            icon.__demoWired = true;
+            icon.addEventListener('click', function (e) {
+              e.preventDefault();
+              e.stopPropagation();
+              go(href);
+            });
+          }
+        }
+        mapEl.querySelectorAll('.pin-wrap, [data-demo-site]').forEach(function (wrap) {
+          var siteAttr = (wrap.getAttribute('data-demo-site') || '').toLowerCase();
+          var label = textOf(wrap.querySelector('.pin-label')) || textOf(wrap);
+          if (siteAttr === 'beckton' || /Beckton/i.test(label)) wirePin(wrap, ROUTES.becktonGt);
+          else if (siteAttr === 'oxford' || /Oxford/i.test(label)) wirePin(wrap, ROUTES.oxfordGt);
         });
       } catch (e) { /* ignore */ }
     }
-    setTimeout(attachMapClicks, 600);
-    setTimeout(attachMapClicks, 1600);
+    setTimeout(attachMapClicks, 400);
+    setTimeout(attachMapClicks, 1000);
+    setTimeout(attachMapClicks, 2200);
+  }
+
+  function enableRegionPanelClicks() {
+    document.querySelectorAll('.panel').forEach(function (p) {
+      p.style.pointerEvents = 'auto';
+    });
+    document.querySelectorAll('.srow, .viewall, .slist').forEach(function (el) {
+      el.style.pointerEvents = 'auto';
+    });
   }
 
   function wireRegionLondon() {
     if (file.indexOf('03-region') !== 0) return;
+    enableRegionPanelClicks();
     document.querySelectorAll('.srow').forEach(function (row) {
       var name = textOf(row.querySelector('.name'));
-      if (/Beckton/i.test(name)) {
+      var siteAttr = (row.getAttribute('data-demo-site') || '').toLowerCase();
+      if (siteAttr === 'beckton' || /Beckton/i.test(name)) {
+        row.setAttribute('data-demo-site', 'beckton');
+        row.setAttribute('data-demo-nav', 'open-site');
         onClick(row, function () { go(ROUTES.becktonGt); });
       }
     });
-    document.querySelectorAll('.viewall').forEach(function (el) {
-      onClick(el, function () { go(ROUTES.becktonGt); });
+    document.querySelectorAll('.viewall, [data-demo-nav="open-site"]').forEach(function (el) {
+      var siteAttr = (el.getAttribute('data-demo-site') || '').toLowerCase();
+      if (siteAttr === 'oxford') return;
+      if (siteAttr === 'beckton' || /Open site/i.test(textOf(el)) || el.classList.contains('viewall')) {
+        el.setAttribute('data-demo-site', 'beckton');
+        onClick(el, function () { go(ROUTES.becktonGt); });
+      }
     });
+    // Map pins on region screen
+    setTimeout(function () {
+      document.querySelectorAll('.pin-wrap').forEach(function (wrap) {
+        var label = textOf(wrap.querySelector('.pin-label')) || textOf(wrap);
+        var siteAttr = (wrap.getAttribute('data-demo-site') || '').toLowerCase();
+        if (siteAttr === 'beckton' || /Beckton/i.test(label)) {
+          var icon = wrap.closest('.leaflet-marker-icon, .leaflet-div-icon');
+          if (icon) { icon.style.pointerEvents = 'auto'; icon.style.cursor = 'pointer'; icon.style.zIndex = '650'; }
+          wrap.style.pointerEvents = 'auto'; wrap.style.cursor = 'pointer';
+          onClick(wrap, function () { go(ROUTES.becktonGt); });
+        }
+      });
+    }, 800);
   }
 
   function wireRegionTV() {
     if (file.indexOf('06-region') !== 0) return;
+    enableRegionPanelClicks();
     document.querySelectorAll('.srow').forEach(function (row) {
       var name = textOf(row.querySelector('.name'));
-      if (/Oxford/i.test(name)) {
+      var siteAttr = (row.getAttribute('data-demo-site') || '').toLowerCase();
+      if (siteAttr === 'oxford' || /Oxford/i.test(name)) {
+        row.setAttribute('data-demo-site', 'oxford');
+        row.setAttribute('data-demo-nav', 'open-site');
         onClick(row, function () { go(ROUTES.oxfordGt); });
       }
     });
-    document.querySelectorAll('.viewall').forEach(function (el) {
-      onClick(el, function () { go(ROUTES.oxfordGt); });
+    document.querySelectorAll('.viewall, [data-demo-nav="open-site"]').forEach(function (el) {
+      var siteAttr = (el.getAttribute('data-demo-site') || '').toLowerCase();
+      if (siteAttr === 'beckton') return;
+      if (siteAttr === 'oxford' || /Open site/i.test(textOf(el)) || el.classList.contains('viewall')) {
+        el.setAttribute('data-demo-site', 'oxford');
+        onClick(el, function () { go(ROUTES.oxfordGt); });
+      }
     });
+    // Map pins on TV region — Oxford must be as easy as Beckton on London
+    setTimeout(function () {
+      document.querySelectorAll('.pin-wrap, [data-demo-site="oxford"]').forEach(function (wrap) {
+        if (!wrap.classList.contains('pin-wrap') && wrap.getAttribute('data-demo-site') !== 'oxford') return;
+        var label = textOf(wrap.querySelector && wrap.querySelector('.pin-label')) || textOf(wrap);
+        var siteAttr = (wrap.getAttribute('data-demo-site') || '').toLowerCase();
+        if (siteAttr === 'oxford' || /Oxford/i.test(label)) {
+          var icon = wrap.closest('.leaflet-marker-icon, .leaflet-div-icon');
+          if (icon) { icon.style.pointerEvents = 'auto'; icon.style.cursor = 'pointer'; icon.style.zIndex = '700'; }
+          wrap.style.pointerEvents = 'auto'; wrap.style.cursor = 'pointer';
+          wrap.setAttribute('data-demo-site', 'oxford');
+          onClick(wrap, function () { go(ROUTES.oxfordGt); });
+          if (icon && !icon.__demoWiredOx) {
+            icon.__demoWiredOx = true;
+            icon.addEventListener('click', function (e) {
+              e.preventDefault(); e.stopPropagation(); go(ROUTES.oxfordGt);
+            });
+          }
+        }
+      });
+    }, 600);
+    setTimeout(function () {
+      document.querySelectorAll('.pin-wrap').forEach(function (wrap) {
+        var label = textOf(wrap.querySelector('.pin-label')) || textOf(wrap);
+        if (/Oxford/i.test(label)) {
+          var icon = wrap.closest('.leaflet-marker-icon, .leaflet-div-icon');
+          if (icon) { icon.style.pointerEvents = 'auto'; icon.style.cursor = 'pointer'; icon.style.zIndex = '700'; }
+          wrap.style.pointerEvents = 'auto'; wrap.style.cursor = 'pointer';
+          onClick(wrap, function () { go(ROUTES.oxfordGt); });
+        }
+      });
+    }, 1600);
   }
 
   function ensureProjectTeamId() {
@@ -559,12 +662,118 @@
     document.body.appendChild(b);
   }
 
+  function showDemoToast(msg) {
+    var t = document.getElementById('demo-toast');
+    if (!t) {
+      t = document.createElement('div');
+      t.id = 'demo-toast';
+      t.className = 'demo-toast-fallback';
+      t.setAttribute('style', 'position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:99998;background:rgba(10,37,64,0.94);color:#E8F4FA;font:600 12.5px Inter,system-ui,sans-serif;padding:10px 18px;border-radius:10px;border:1px solid rgba(0,163,224,0.35);opacity:0;transition:opacity .2s;pointer-events:none;');
+      document.body.appendChild(t);
+    }
+    t.textContent = msg || 'Demo overview only — full GT board not wired for this site';
+    t.classList.add('show');
+    t.style.opacity = '1';
+    clearTimeout(showDemoToast._tm);
+    showDemoToast._tm = setTimeout(function () {
+      t.classList.remove('show');
+      t.style.opacity = '0';
+    }, 2200);
+  }
+
+
+  function wireOpenSiteHooks() {
+    document.querySelectorAll('[data-demo-nav="open-site"]').forEach(function (el) {
+      var s = (el.getAttribute('data-demo-site') || '').toLowerCase();
+      if (s === 'oxford') onClick(el, function () { go(ROUTES.oxfordGt); });
+      else if (s === 'beckton') onClick(el, function () { go(ROUTES.becktonGt); });
+    });
+  }
+
+  function wirePortfolio() {
+    if (file.indexOf('00-sites-portfolio') !== 0) return;
+
+    document.querySelectorAll('[data-demo-nav="open-site"]').forEach(function (el) {
+      var s = (el.getAttribute('data-demo-site') || '').toLowerCase();
+      onClick(el, function () {
+        if (s === 'oxford') go(ROUTES.oxfordGt);
+        else if (s === 'beckton') go(ROUTES.becktonGt);
+      });
+    });
+
+    // Entire live columns clickable via any cell with data-col + col-live
+    document.querySelectorAll('.col-live[data-col="beckton"], [data-col="beckton"].col-live').forEach(function (el) {
+      onClick(el, function () { go(ROUTES.becktonGt); });
+    });
+    document.querySelectorAll('.col-live[data-col="oxford"], [data-col="oxford"].col-live').forEach(function (el) {
+      onClick(el, function () { go(ROUTES.oxfordGt); });
+    });
+
+    // Demo-only peers — toast / no-op
+    document.querySelectorAll('[data-demo-nav="demo-only"], .cell.site-head.col-demo, .demo-muted[data-demo-nav]').forEach(function (el) {
+      if (el.__demoWired) return;
+      el.__demoWired = true;
+      mark(el);
+      el.addEventListener('click', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        showDemoToast('Demo overview only — full GT board not wired for this site');
+      });
+    });
+  }
+
+  function ensureAllSitesNav() {
+    // Site rails: inject "All sites" under Map so Portfolio is reachable from GT boards
+    if (file.indexOf('01-login') === 0) return;
+    if (file.indexOf('00-sites-portfolio') === 0) return;
+    if (document.querySelector('[data-demo-nav="portfolio"]')) return;
+    var nav = document.querySelector('.rail .nav');
+    if (!nav) return;
+    var mapItem = nav.querySelector('[data-demo-nav="map"]');
+    var item = document.createElement('div');
+    item.className = 'nav-item';
+    item.setAttribute('data-demo-nav', 'portfolio');
+    item.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="7" height="7" rx="1"/><rect x="14" y="4" width="7" height="7" rx="1"/><rect x="3" y="13" width="7" height="7" rx="1"/><rect x="14" y="13" width="7" height="7" rx="1"/></svg>All sites';
+    if (mapItem && mapItem.parentNode === nav) {
+      if (mapItem.nextSibling) nav.insertBefore(item, mapItem.nextSibling);
+      else nav.appendChild(item);
+    } else {
+      nav.insertBefore(item, nav.firstChild);
+    }
+  }
+
+  function ensurePortfolioCrumb() {
+    var crumbs = document.querySelector('.crumbs');
+    if (!crumbs) return;
+    if (/Portfolio/i.test(textOf(crumbs))) return;
+    // Prepend Portfolio link for site / region screens
+    if (file.indexOf('01-login') === 0 || file.indexOf('00-sites') === 0 || file.indexOf('02-map') === 0) return;
+    var span = document.createElement('span');
+    span.className = 'demo-crumb demo-linked';
+    span.textContent = 'Portfolio';
+    span.style.cursor = 'pointer';
+    span.style.color = '#7DD3FC';
+    span.setAttribute('data-demo-nav', 'portfolio');
+    var sep = document.createElement('span');
+    sep.className = 'sep';
+    sep.textContent = ' / ';
+    sep.style.margin = '0 6px';
+    sep.style.opacity = '0.45';
+    crumbs.insertBefore(sep, crumbs.firstChild);
+    crumbs.insertBefore(span, crumbs.firstChild);
+    onClick(span, function () { go(ROUTES.portfolio); });
+  }
+
   function init() {
     addDemoBadge();
+    ensureAllSitesNav();
     wireLogout();
     wireSiteRail();
+    ensurePortfolioCrumb();
     wireCrumbs();
     wireLogin();
+    wirePortfolio();
+    wireOpenSiteHooks();
     wireMapHome();
     wireRegionLondon();
     wireRegionTV();

@@ -103,7 +103,7 @@ html, body { width: 1440px; height: 900px; overflow: hidden; font-family: var(--
   border-radius: 16px;
   box-shadow: 0 14px 44px rgba(0,0,0,0.4);
   color: #0A2540;
-  pointer-events: none;
+  pointer-events: auto;
 }
 .panel h2 { font-size: 16px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
 .panel h2 .count {
@@ -171,6 +171,8 @@ html, body { width: 1440px; height: 900px; overflow: hidden; font-family: var(--
   pointer-events: none;
 }
 .pin-label.left { left: auto; right: 14px; }
+.demo-site-pin { background: transparent !important; border: none !important; }
+.demo-site-pin .pin-wrap { pointer-events: auto !important; cursor: pointer; }
 .region-name-label {
   background: transparent!important; border: none!important;
   font-family: Inter, sans-serif; font-weight: 800; letter-spacing: 0.12em;
@@ -222,7 +224,8 @@ html, body { width: 1440px; height: 900px; overflow: hidden; font-family: var(--
   <div class="divider"></div>
   <nav class="nav">
     <div class="nav-label">Navigate</div>
-    <div class="nav-item" data-demo-nav="map"><svg><use href="#i-map"/></svg>Overview / Map</div>
+    <div class="nav-item" data-demo-nav="portfolio"><svg><use href="#i-sites"/></svg>Portfolio</div>
+    <div class="nav-item" data-demo-nav="map"><svg><use href="#i-map"/></svg>Map</div>
     <div class="nav-item active" data-demo-nav="regions"><svg><use href="#i-regions"/></svg>Regions</div>
     <div class="nav-item" data-demo-nav="sites"><svg><use href="#i-sites"/></svg>Site locations</div>
     <div class="nav-section-gap"></div>
@@ -281,7 +284,7 @@ html, body { width: 1440px; height: 900px; overflow: hidden; font-family: var(--
       <span class="chip">Depot</span>
     </div>
     <div class="slist">
-      <div class="srow active">
+      <div class="srow active" data-demo-site="oxford" data-demo-nav="open-site">
         <span class="dot r"></span>
         <div class="meta"><span class="name">Oxford STW</span><span class="loc">Sandford · Oxfordshire</span></div>
         <span class="tag">STW</span>
@@ -307,7 +310,7 @@ html, body { width: 1440px; height: 900px; overflow: hidden; font-family: var(--
         <span class="tag">STW</span>
       </div>
     </div>
-    <div class="viewall">Open site dashboard →</div>
+    <div class="viewall" data-demo-site="oxford" data-demo-nav="open-site">Open site dashboard →</div>
   </div>
 </div>
 
@@ -373,17 +376,22 @@ html, body { width: 1440px; height: 900px; overflow: hidden; font-family: var(--
   ];
 
   sites.forEach(function (s) {
+    var live = s.name === 'Oxford';
     var halo = '';
     if (s.rag === 'a') halo = '<div class="pin-halo"></div>';
     if (s.rag === 'r') halo = '<div class="pin-halo r"></div>';
     var lblClass = s.side === 'left' ? 'pin-label left' : 'pin-label';
-    var html = '<div class="pin-wrap">' + halo +
+    var html = '<div class="pin-wrap"' + (live ? ' data-demo-site="oxford" data-demo-nav="open-site"' : '') + '>' + halo +
       '<div class="pin-dot ' + s.rag + '"></div>' +
       '<div class="' + lblClass + '">' + s.name + '</div></div>';
-    L.marker([s.lat, s.lng], {
-      interactive: false,
-      icon: L.divIcon({ className: '', html: html, iconSize: [0, 0], iconAnchor: [0, 0] })
+    var marker = L.marker([s.lat, s.lng], {
+      interactive: live,
+      zIndexOffset: live ? 900 : 0,
+      icon: L.divIcon({ className: live ? 'demo-site-pin' : '', html: html, iconSize: live ? [100, 28] : [0, 0], iconAnchor: live ? [10, 14] : [0, 0] })
     }).addTo(map);
+    if (live) {
+      marker.on('click', function () { location.href = '05-oxford-dashboard-gt.html'; });
+    }
   });
 
   var readyFired = false;
