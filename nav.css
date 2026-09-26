@@ -84,3 +84,13 @@ html.live-demo-shell body {
   cursor: default;
 }
 #demo-toast.show { opacity: 1 !important; }
+
+
+/* partner-share: allow scroll on smaller screens */
+html {
+  overflow: auto !important;
+}
+body {
+  overflow: auto !important;
+  min-height: 100vh;
+}
